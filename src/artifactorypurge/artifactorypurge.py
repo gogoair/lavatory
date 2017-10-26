@@ -15,8 +15,9 @@ LOG = getLogger(__name__)
 @click.option(
     '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
 @click.option('--plugin-path', required=True, help='Path to plugin directory')
+@click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
 #@click.argument('url')
-def purge(dryrun, plugin_path):  #, url):
+def purge(dryrun, plugin_path, default):  #, url):
     credentials = load_credentials()
     artifactory = Artifactory(credentials['artifactory_url'], credentials['artifactory_username'],
                               credentials['artifactory_password'])
@@ -28,8 +29,12 @@ def purge(dryrun, plugin_path):  #, url):
         try:
             artifactory_plugin = plugin_source.load_plugin(plugin_name)
         except ModuleNotFoundError:
-            LOG.info("Not plugin found for %s. Applying Default", repo)
-            artifactory_plugin = plugin_source.load_plugin('default')
+            if default:
+                LOG.info("No plugin found for %s. Applying Default", repo)
+                artifactory_plugin = plugin_source.load_plugin('default')
+            else:
+                LOG.info("No plugin found for %s. Skipping Default", repo)
+                continue
         artifacts = artifactory_plugin.purgelist(
             artifactory,
             repo,
@@ -46,13 +51,6 @@ def purge(dryrun, plugin_path):  #, url):
             get_performance_report(repo, before[repo], info)
         except IndexError:
             pass
-
-    if len(exceptions):
-        LOG.error("There were errors:")
-        for repo, exception in exceptions.items():
-            LOG.error("  {}: {}".format(repo, exception))
-
-        exit(1)
 
     LOG.info("Done.")
 
