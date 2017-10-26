@@ -5,8 +5,9 @@ import pytest
 from artifactorypurge.exceptions import MissingEnvironmentVariable
 from artifactorypurge.credentials import load_credentials
 
-def test_missing_credentials_exception():
+def test_missing_credentials_exception(monkeypatch):
     """Tests that an exception is raised if environment variable is missing"""
+    monkeypatch.setenv('ARTIFACTORY_URL', None)
     with pytest.raises(MissingEnvironmentVariable):
         load_credentials()
 
