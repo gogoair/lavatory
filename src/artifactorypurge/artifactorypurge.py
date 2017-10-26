@@ -26,7 +26,7 @@ def _performance(name, old, new):
 
 
 @click.command()
-@click.option('--dryrun/--nodryrun', default=True, is_flag=True, help='Safety is on by default')
+@click.option('--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
 @click.option('--reponame', default=None, help='Operate on single repo')
 @click.option('--project', default=None, help='Operate on single project')
 #@click.argument('url')
