@@ -1,19 +1,6 @@
-Experimental work to see if the artifactory retention policy
-code can be normalized for all types of repositories
+#ArtifactoryPurge
 
+Artifactory tooling for managing repository specific retention policies Edit
+Add topics
 
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
-Needsmorecontent
+More info to come
