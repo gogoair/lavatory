@@ -2,9 +2,9 @@ import click
 from humanfriendly import parse_size, format_number, format_size
 import imp
 from .utils.logging import getLogger
-from .credentials import CREDENTIALS
+from .credentials import load_credentials
 
-from utils.artifactory import Artifactory
+from .utils.artifactory import Artifactory
 
 LOG = getLogger(__name__)
 
@@ -30,9 +30,10 @@ def _performance(name, old, new):
 def purge(dryrun, reponame, project): #, url):
     exceptions = {}
 
-    artifactory = Artifactory(CREDENTIALS['artifactory_url'], 
-                              CREDENTIALS['artifactory_username'],
-                              CREDENTIALS['artifactory_password'])
+    credentails = load_credentials()
+    artifactory = Artifactory(credentials['artifactory_url'], 
+                              credentials['artifactory_username'],
+                              credentials['artifactory_password'])
 
     before = artifactory.list(reponame)
     for repo, info in before.items():

@@ -48,6 +48,6 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'artifactorypurge=artifactorypurge.artifactorypurge.purge'
+            'artifactorypurge=artifactorypurge.artifactorypurge:purge'
             ]},
     )

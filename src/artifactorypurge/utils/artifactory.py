@@ -1,6 +1,6 @@
 import datetime
 import json
-from utils.logging import getLogger
+from ..utils.logging import getLogger
 import requests
 
 
