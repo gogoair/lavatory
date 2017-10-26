@@ -1,46 +1,42 @@
+import os
+
 import click
 from pluginbase import PluginBase
-from .utils.logging import getLogger
-from .credentials import load_credentials
 
+from .credentials import load_credentials
 from .utils.artifactory import Artifactory
+from .utils.logging import getLogger
 from .utils.performance import get_performance_report
 
 LOG = getLogger(__name__)
 
+
 @click.command()
-@click.option('--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
+@click.option(
+    '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
 @click.option('--plugin-path', required=True, help='Path to plugin directory')
 #@click.argument('url')
-def purge(dryrun, plugin_path): #, url):
-    exceptions = {}
-
+def purge(dryrun, plugin_path):  #, url):
     credentials = load_credentials()
-    artifactory = Artifactory(credentials['artifactory_url'], 
-                              credentials['artifactory_username'],
+    artifactory = Artifactory(credentials['artifactory_url'], credentials['artifactory_username'],
                               credentials['artifactory_password'])
 
     plugin_source = setup_pluginbase(plugin_path)
     before = artifactory.list(None)
     for repo, info in before.items():
-        fp = 0
+        plugin_name = repo.replace("-", "_")
         try:
-            plugin_name = repo.replace("-", "_")
-            try:
-                artifactory_plugin = plugin_source.load_plugin(plugin_name)
-            except ModuleNotFoundError:
-                LOG.info("Not plugin found for %s. Applying Default", repo)
-                artifactory_plugin = plugin_source.load_plugin('default')
-            #fp, pathname, description = imp.find_module(modulename, ["repositories",])
-            #module =  imp.load_module(modulename, fp, pathname, description)
-            artifacts = artifactory_plugin.purgelist(artifactory, repo, None,)
-            count = artifactory.purge(repo, dryrun, artifacts)
-            LOG.info("processed {}, purged {}".format(repo, count))
-        except IndexError as e:  # FIXME: return to generic catch
-            exceptions[repo] = str(e)
-        finally:
-            if fp:
-                fp.close()
+            artifactory_plugin = plugin_source.load_plugin(plugin_name)
+        except ModuleNotFoundError:
+            LOG.info("Not plugin found for %s. Applying Default", repo)
+            artifactory_plugin = plugin_source.load_plugin('default')
+        artifacts = artifactory_plugin.purgelist(
+            artifactory,
+            repo,
+            None,
+        )
+        count = artifactory.purge(repo, dryrun, artifacts)
+        LOG.info("processed {}, purged {}".format(repo, count))
 
     LOG.info("")
     LOG.info("Purging Performance:")
@@ -62,9 +58,21 @@ def purge(dryrun, plugin_path): #, url):
 
     exit(0)
 
+
 def setup_pluginbase(plugin_path):
+    """Sets up plugin base with default path and provided path
+    
+    Args:
+        plugin_path (str): Extra path to find plugins in
+
+    Returns:
+        PluginSource: PluginBase PluginSource for finding plugins
+    """
+    here = os.path.dirname(os.path.realpath(__file__))
+    default_path = "{}/plugins".format(here)
+    LOG.info("Searching for plugins in %s and %s", plugin_path, default_path)
     plugin_base = PluginBase(package='artifactorypurge.plugins')
-    plugin_source = plugin_base.make_plugin_source(searchpath=[plugin_path])
+    plugin_source = plugin_base.make_plugin_source(searchpath=[plugin_path, default_path])
     return plugin_source
 
 
