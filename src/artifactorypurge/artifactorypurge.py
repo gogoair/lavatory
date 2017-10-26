@@ -1,5 +1,5 @@
 import click
-import imp
+from pluginbase import PluginBase
 from .utils.logging import getLogger
 from .credentials import load_credentials
 
@@ -10,10 +10,9 @@ LOG = getLogger(__name__)
 
 @click.command()
 @click.option('--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
-@click.option('--reponame', default=None, help='Operate on single repo')
-@click.option('--project', default=None, help='Operate on single project')
+@click.option('--plugin-path', required=True, help='Path to plugin directory')
 #@click.argument('url')
-def purge(dryrun, reponame, project): #, url):
+def purge(dryrun, plugin_path): #, url):
     exceptions = {}
 
     credentials = load_credentials()
@@ -21,27 +20,31 @@ def purge(dryrun, reponame, project): #, url):
                               credentials['artifactory_username'],
                               credentials['artifactory_password'])
 
-    before = artifactory.list(reponame)
+    plugin_source = setup_pluginbase(plugin_path)
+    before = artifactory.list(None)
     for repo, info in before.items():
         fp = 0
         try:
-            modulename = repo.replace("-", "_")
-            fp, pathname, description = imp.find_module(modulename, ["repositories",])
-            module =  imp.load_module(modulename, fp, pathname, description)
-            artifacts = module.purgelist(artifactory, repo, project)
+            plugin_name = repo.replace("-", "_")
+            try:
+                artifactory_plugin = plugin_source.load_plugin(plugin_name)
+            except ModuleNotFoundError:
+                LOG.info("Not plugin found for %s. Applying Default", repo)
+                artifactory_plugin = plugin_source.load_plugin('default')
+            #fp, pathname, description = imp.find_module(modulename, ["repositories",])
+            #module =  imp.load_module(modulename, fp, pathname, description)
+            artifacts = artifactory_plugin.purgelist(artifactory, repo, None,)
             count = artifactory.purge(repo, dryrun, artifacts)
             LOG.info("processed {}, purged {}".format(repo, count))
         except IndexError as e:  # FIXME: return to generic catch
             exceptions[repo] = str(e)
-        except ImportError:
-            continue
         finally:
             if fp:
                 fp.close()
 
     LOG.info("")
     LOG.info("Purging Performance:")
-    after = artifactory.list(reponame)
+    after = artifactory.list(None)
     for repo, info in after.items():
         try:
             get_performance_report(repo, before[repo], info)
@@ -58,6 +61,11 @@ def purge(dryrun, reponame, project): #, url):
     LOG.info("Done.")
 
     exit(0)
+
+def setup_pluginbase(plugin_path):
+    plugin_base = PluginBase(package='artifactorypurge.plugins')
+    plugin_source = plugin_base.make_plugin_source(searchpath=[plugin_path])
+    return plugin_source
 
 
 if __name__ == "__main__":
