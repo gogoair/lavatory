@@ -1,13 +1,10 @@
 import click
 from humanfriendly import parse_size, format_number, format_size
 import imp
-from utils.logging import getLogger
+from .utils.logging import getLogger
+from .credentials import CREDENTIALS
 
 from utils.artifactory import Artifactory
-
-URL = "deleted"
-USER = "deleted"
-PASSWD = "deleted"
 
 LOG = getLogger(__name__)
 
@@ -33,7 +30,9 @@ def _performance(name, old, new):
 def purge(dryrun, reponame, project): #, url):
     exceptions = {}
 
-    artifactory = Artifactory(URL, USER, PASSWD)
+    artifactory = Artifactory(CREDENTIALS['artifactory_url'], 
+                              CREDENTIALS['artifactory_username'],
+                              CREDENTIALS['artifactory_password'])
 
     before = artifactory.list(reponame)
     for repo, info in before.items():

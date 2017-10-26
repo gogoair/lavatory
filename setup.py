@@ -46,5 +46,8 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
     ],
-    entry_points={},
+    entry_points={
+        'console_scripts': [
+            'artifactorypurge=artifactorypurge.artifactorypurge.purge'
+            ]},
     )

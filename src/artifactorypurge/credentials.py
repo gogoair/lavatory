@@ -1,5 +1,5 @@
 import os
-from exceptions import MissingEnvironmentVariable
+from .exceptions import MissingEnvironmentVariable
 
 CREDENTIALS = {
         "artifactory_password": os.getenv('ARTIFACTORY_PASSWORD'),
