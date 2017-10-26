@@ -5,9 +5,9 @@ from utils.logging import getLogger
 
 from utils.artifactory import Artifactory
 
-URL = "***REMOVED***"
-USER = "***REMOVED***"
-PASSWD = "***REMOVED***"
+URL = "deleted"
+USER = "deleted"
+PASSWD = "deleted"
 
 LOG = getLogger(__name__)
 
