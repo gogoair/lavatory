@@ -1,0 +1,20 @@
+sudo: false
+language: python
+cache: false
+
+matrix:
+  include:
+    - python: 3.4
+      env: TOXENV=py34
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
+#    - python: 3.6
+#      env: TOXENV=lint
+
+install:
+  - pip install -r requirements-dev.txt
+
+script:
+  - tox -e $TOXENV
