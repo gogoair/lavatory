@@ -4,7 +4,7 @@ from .utils.logging import getLogger
 from .credentials import load_credentials
 
 from .utils.artifactory import Artifactory
-from .utils.performance import get_space_performance
+from .utils.performance import get_performance_report
 
 LOG = getLogger(__name__)
 
@@ -44,7 +44,7 @@ def purge(dryrun, reponame, project): #, url):
     after = artifactory.list(reponame)
     for repo, info in after.items():
         try:
-            get_space_performance(repo, before[repo], info)
+            get_performance_report(repo, before[repo], info)
         except IndexError:
             pass
 

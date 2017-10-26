@@ -3,7 +3,7 @@ from .logging import getLogger
 
 LOG = getLogger(__name__)
 
-def get_space_performance(repo_name, old_info, new_info):
+def get_performance_report(repo_name, old_info, new_info):
     """compares retention policy performance, showing old amount of space and new.
 
     Args:
