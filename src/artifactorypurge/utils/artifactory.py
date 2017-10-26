@@ -10,7 +10,7 @@ LOG = getLogger(__name__)
 class _Http(object):
 
     def __init__(self, baseurl, user, passwd):
-        self.baseurl = baseurl + "/artifactory"
+        self.baseurl = baseurl
         self.apiurl = baseurl + "/api"
         self.auth = (user, passwd)
 

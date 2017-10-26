@@ -1,26 +1,12 @@
 import click
-from humanfriendly import parse_size, format_number, format_size
 import imp
 from .utils.logging import getLogger
 from .credentials import load_credentials
 
 from .utils.artifactory import Artifactory
+from .utils.performance import get_space_performance
 
 LOG = getLogger(__name__)
-
-def _performance(name, old, new):
-    oldSpace = parse_size(old["usedSpace"])
-    newSpace = parse_size(new["usedSpace"])
-
-    oldFiles = old["filesCount"]
-    newFiles = new["filesCount"]
-
-    return "  {} size: {}; reduction: storage {} ({}%), files {} ({}%)".format(
-            name, format_size(newSpace),
-            format_size(newSpace-oldSpace), (100*(oldSpace-newSpace))/oldSpace,
-            format_number(newFiles-oldFiles), (100*(oldFiles-newFiles))/oldFiles
-            )
-
 
 @click.command()
 @click.option('--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
@@ -30,7 +16,7 @@ def _performance(name, old, new):
 def purge(dryrun, reponame, project): #, url):
     exceptions = {}
 
-    credentails = load_credentials()
+    credentials = load_credentials()
     artifactory = Artifactory(credentials['artifactory_url'], 
                               credentials['artifactory_username'],
                               credentials['artifactory_password'])
@@ -47,6 +33,8 @@ def purge(dryrun, reponame, project): #, url):
             LOG.info("processed {}, purged {}".format(repo, count))
         except IndexError as e:  # FIXME: return to generic catch
             exceptions[repo] = str(e)
+        except ImportError:
+            continue
         finally:
             if fp:
                 fp.close()
@@ -56,7 +44,7 @@ def purge(dryrun, reponame, project): #, url):
     after = artifactory.list(reponame)
     for repo, info in after.items():
         try:
-            LOG.info(_performance(repo, before[repo], info))
+            get_space_performance(repo, before[repo], info)
         except IndexError:
             pass
 
