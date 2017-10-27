@@ -77,6 +77,7 @@ def setup_pluginbase(extra_policies_path=None):
     LOG.info("Searching for policies in %s", ', '.join(all_paths))
     plugin_base = PluginBase(package='artifactorypurge.policy_plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
+    LOG.debug("Policies found: %s", str(plugin_source.list_plugins()))
     return plugin_source
 
 
