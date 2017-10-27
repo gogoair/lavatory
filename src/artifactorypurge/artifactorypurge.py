@@ -14,15 +14,15 @@ LOG = getLogger(__name__)
 @click.command()
 @click.option(
     '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
-@click.option('--plugin-path', required=True, help='Path to plugin directory')
 @click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
+@click.option('--policies-path', required=False, help='Path to extra policies directory')
 #@click.argument('url')
-def purge(dryrun, plugin_path, default):  #, url):
+def purge(dryrun, policies_path, default):  #, url):
     credentials = load_credentials()
     artifactory = Artifactory(credentials['artifactory_url'], credentials['artifactory_username'],
                               credentials['artifactory_password'])
 
-    plugin_source = setup_pluginbase(plugin_path)
+    plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     before = artifactory.list(None)
     for repo, info in before.items():
         plugin_name = repo.replace("-", "_")
@@ -57,20 +57,23 @@ def purge(dryrun, plugin_path, default):  #, url):
     exit(0)
 
 
-def setup_pluginbase(plugin_path):
+def setup_pluginbase(extra_policies_path=None):
     """Sets up plugin base with default path and provided path
     
     Args:
-        plugin_path (str): Extra path to find plugins in
+        extra_policies_path (str): Extra path to find plugins in
 
     Returns:
         PluginSource: PluginBase PluginSource for finding plugins
     """
     here = os.path.dirname(os.path.realpath(__file__))
-    default_path = "{}/plugins".format(here)
-    LOG.info("Searching for plugins in %s and %s", plugin_path, default_path)
-    plugin_base = PluginBase(package='artifactorypurge.plugins')
-    plugin_source = plugin_base.make_plugin_source(searchpath=[plugin_path, default_path])
+    default_path = "{}/policies".format(here)
+    all_paths = [default_path]
+    if extra_policies_path:
+        all_paths.append(extra_policies_path)
+    LOG.info("Searching for policies in %s", str(all_paths))
+    plugin_base = PluginBase(package='artifactorypurge.policy_plugins')
+    plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
     return plugin_source
 
 
