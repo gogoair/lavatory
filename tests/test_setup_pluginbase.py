@@ -2,7 +2,7 @@
 
 import pytest
 
-from lavatory.lavatory import setup_pluginbase
+from lavatory.utils.setup_pluginbase import setup_pluginbase
 from lavatory.exceptions import InvalidPoliciesDirectory
 
 def test_default_policy_load():
