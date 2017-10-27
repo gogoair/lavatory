@@ -1,6 +1,6 @@
 import logging
 
-import click 
+import click
 import coloredlogs
 
 from .commands.purge import purge
@@ -21,8 +21,8 @@ def root(ctx, verbose):
     if verbosity < logging.DEBUG:
         logging.root.setLevel(verbosity)
 
-root.add_command(purge)
 
+root.add_command(purge)
 
 if __name__ == '__main__':
     root()

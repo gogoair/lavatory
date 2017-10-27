@@ -1,5 +1,6 @@
 import logging
-import click 
+
+import click
 
 from ..credentials import load_credentials
 from ..utils.artifactory import Artifactory
@@ -7,6 +8,7 @@ from ..utils.performance import get_performance_report
 from ..utils.setup_pluginbase import setup_pluginbase
 
 LOG = logging.getLogger(__name__)
+
 
 @click.command()
 @click.pass_context
