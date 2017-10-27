@@ -13,7 +13,7 @@ def test_extra_policies_path_load(tmpdir):
     """Tests that extra policies are loaded from a path"""
     temp_policy = tmpdir.join('test_policy.py')
     temp_policy.write(' ')
-    plugin_source = setup_pluginbase(extra_policies_path=tmpdir)
+    plugin_source = setup_pluginbase(extra_policies_path=str(tmpdir))
     assert 'test_policy' in plugin_source.list_plugins()
 
     
