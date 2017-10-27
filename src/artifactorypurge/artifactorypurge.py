@@ -7,6 +7,7 @@ from .credentials import load_credentials
 from .utils.artifactory import Artifactory
 from .utils.logging import getLogger
 from .utils.performance import get_performance_report
+from .exceptions import InvalidPoliciesDirectory
 
 LOG = getLogger(__name__)
 
@@ -27,21 +28,21 @@ def purge(dryrun, policies_path, default):  #, url):
     for repo, info in before.items():
         policy_name = repo.replace("-", "_")
         try:
-            artifactory_policy = plugin_source.load_plugin(policy_name)
+            policy = plugin_source.load_plugin(policy_name)
         except ModuleNotFoundError:
             if default:
-                LOG.info("No plugin found for %s. Applying Default", repo)
-                artifactory_policy = plugin_source.load_plugin('default')
+                LOG.info("No policy found for %s. Applying Default", repo)
+                policy = plugin_source.load_plugin('default')
             else:
-                LOG.info("No plugin found for %s. Skipping Default", repo)
+                LOG.info("No policy found for %s. Skipping Default", repo)
                 continue
-        artifacts = artifactory_policy.purgelist(
+        artifacts = policy.purgelist(
             artifactory,
             repo,
             None,
         )
         count = artifactory.purge(repo, dryrun, artifacts)
-        LOG.info("processed {}, purged {}".format(repo, count))
+        LOG.info("Processed {}, Purged {}".format(repo, count))
 
     LOG.info("")
     LOG.info("Purging Performance:")
@@ -70,8 +71,10 @@ def setup_pluginbase(extra_policies_path=None):
     default_path = "{}/policies".format(here)
     all_paths = [default_path]
     if extra_policies_path:
+        if not os.path.isdir(extra_policies_path):
+            raise InvalidPoliciesDirectory
         all_paths.append(extra_policies_path)
-    LOG.info("Searching for policies in %s", str(all_paths))
+    LOG.info("Searching for policies in %s", ', '.join(all_paths))
     plugin_base = PluginBase(package='artifactorypurge.policy_plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
     return plugin_source
