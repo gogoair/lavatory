@@ -1,4 +1,4 @@
-"""ArtifactoryPurge related custom exceptions"""
+"""Lavatory related custom exceptions"""
 
 class LavatoryError(Exception):
     """Lavatory related error"""

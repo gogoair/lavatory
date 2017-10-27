@@ -14,7 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""ArtifactoryPurge installer"""
+"""Lavatory installer"""
 
 from setuptools import find_packages, setup
 
@@ -22,7 +22,7 @@ with open('requirements.txt', 'rt') as reqs_file:
     REQUIREMENTS = reqs_file.readlines()
 
 setup(
-    name='artifactorypurge',
+    name='lavatory',
     description='Run retention policies against Artifactory repositories',
     long_description=open('README.md').read(),
     author='Gogo DevOps',
@@ -34,8 +34,8 @@ setup(
     install_requires=REQUIREMENTS,
     include_package_data=True,
     keywords="gogo infrastructure python artifactory jfrog",
-    url='https://github.com/gogoair/artifactorypurge',
-    download_url='https://github.com/gogoair/artifactorypurge',
+    url='https://github.com/gogoair/lavatory',
+    download_url='https://github.com/gogoair/lavatory',
     platforms=['OS Independent'],
     license='Apache License (2.0)',
     classifiers=[
@@ -48,6 +48,6 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'artifactorypurge=artifactorypurge.artifactorypurge:purge'
+            'lavatory=lavatory.lavatory:purge'
             ]},
     )

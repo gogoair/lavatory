@@ -1,8 +1,9 @@
-[![Build Status](https://travis-ci.org/gogoair/artifactorypurge.svg?branch=master)](https://travis-ci.org/gogoair/artifactorypurge)
+[![Build Status](https://travis-ci.org/gogoair/lavatory.svg?branch=master)](https://travis-ci.org/gogoair/lavatory)
 
-# ArtifactoryPurge
+# Lavatory
 
-Artifactory tooling for managing repository specific retention policies
+Tooling to define repository specific retention policies in Artifactory. Allows highly customizable
+retention policies via Python plugins. 
 
 ## Authentication
 

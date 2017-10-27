@@ -60,7 +60,7 @@ def purge(dryrun, policies_path, default):  #, url):
 
 def setup_pluginbase(extra_policies_path=None):
     """Sets up plugin base with default path and provided path
-    
+
     Args:
         extra_policies_path (str): Extra path to find plugins in
 
@@ -74,8 +74,8 @@ def setup_pluginbase(extra_policies_path=None):
         if not os.path.isdir(extra_policies_path):
             raise InvalidPoliciesDirectory
         all_paths.append(extra_policies_path)
-    LOG.info("Searching for policies in %s", ', '.join(all_paths))
-    plugin_base = PluginBase(package='artifactorypurge.policy_plugins')
+    LOG.info("Searching for policies in %s", str(all_paths))
+    plugin_base = PluginBase(package='lavatory.policy_plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
     LOG.debug("Policies found: %s", str(plugin_source.list_plugins()))
     return plugin_source
