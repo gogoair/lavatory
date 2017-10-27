@@ -5,6 +5,13 @@
 Tooling to define repository specific retention policies in Artifactory. Allows highly customizable
 retention policies via Python plugins. 
 
+This tool is an Work in Progres! Not ready for production use!
+
+### Requirements:
+- Python 3.4+
+- Artifactory user with API permissions
+
+
 ## Authentication
 
 This tool looks for 3 enviroment variables in order to authenticate:
@@ -38,14 +45,14 @@ pip install -U .
 $ lavatory --help
 Usage: lavatory [OPTIONS] COMMAND [ARGS]...
 
-  Lavatory CLI entry point
+  Lavatory is a tool for managing Artifactory Retention Policies
 
 Options:
   -v, --verbose  Increases logging level
   --help         Show this message and exit.
 
 Commands:
-  purge
+  purge  Deletes artifacts based on retention policies
 ```
 
 ### Purging Artifacts
@@ -56,6 +63,8 @@ Commands:
 $ lavatory purge --help
 Usage: lavatory purge [OPTIONS]
 
+  Deletes artifacts based on retention policies
+
 Options:
   --policies-path TEXT      Path to extra policies directory
   --dryrun / --nodryrun     Dryrun does not delete any artifacts. On by
@@ -63,7 +72,6 @@ Options:
   --default / --no-default  If false, does not apply default policy
   --help                    Show this message and exit.
 ```
-
 
 ## Testing
 

@@ -16,8 +16,8 @@ LOG = logging.getLogger(__name__)
 @click.option(
     '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
 @click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
-#@click.argument('url')
 def purge(ctx, dryrun, policies_path, default):
+    """Deletes artifacts based on retention policies"""
     credentials = load_credentials()
     artifactory = Artifactory(credentials['artifactory_url'], credentials['artifactory_username'],
                               credentials['artifactory_password'])
