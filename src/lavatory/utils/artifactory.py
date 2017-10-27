@@ -1,21 +1,59 @@
+import base64
 import datetime
 import json
 import logging
+from ..credentials import load_credentials
 
 import requests
+import party
 
 LOG = logging.getLogger(__name__)
 
+CREDENTIALS = load_credentials()
+
+PARTY_CONFIG = {
+    'artifactory_url': CREDENTIALS['artifactory_url'],
+    'username': CREDENTIALS['artifactory_username'],
+    'password': base64.encodebytes(CREDENTIALS['artifactory_password']),
+}
+
+
+def artifactory_auth():
+    decode_password = base64.decodebytes(PARTY_CONFIG.get('password'))
+    auth = (PARTY_CONFIG.get('username'), decode_password)
+    return auth
+
+
+def _parse_artifact_name(name):
+    simple_name = '/'.join(name.split('/')[-4:])
+    return simple_name
+
+
+def artifacts(search='*rpm', repo='ext-release-local', depth=3, **kwargs):
+    """ Returns a dict of artifact and properties """
+    LOG.debug('Finding all artifacts with: search=%s, repo=%s, depth=%s', search, repo, depth)
+    all_artifacts = {}
+    artifactory = party.Party(PARTY_CONFIG)
+    artifactory.find_by_pattern(filename=search, specific_repo=repo, max_depth=depth)
+
+    for artifact in sorted(artifactory.files):
+        artifact_simple_name = _parse_artifact_name(artifact)
+        LOG.debug('Found: %s', artifact_simple_name)
+        artifactory.get_properties(artifact)
+        all_artifacts.update({artifact: artifactory.properties})
+
+    LOG.info('Found %d artifacts in total.', len(all_artifacts))
+    return all_artifacts
+
 
 class _Http(object):
-
     def __init__(self, baseurl, user, passwd):
         self.baseurl = baseurl
         self.apiurl = baseurl + "/api"
         self.auth = (user, passwd)
 
     def get(self, endpoint):
-        response = requests.get(self.apiurl+endpoint, auth=self.auth)
+        response = requests.get(self.apiurl + endpoint, auth=self.auth)
 
         if response.ok:
             return response.json()
@@ -23,7 +61,7 @@ class _Http(object):
             response.raise_for_status()
 
     def post(self, endpoint, payload):
-        response = requests.post(self.apiurl+endpoint, auth=self.auth, data=payload)
+        response = requests.post(self.apiurl + endpoint, auth=self.auth, data=payload)
 
         if response.ok:
             return response.json()
@@ -31,9 +69,6 @@ class _Http(object):
             response.raise_for_status()
 
     def delete(self, path):
-        LOG.info("DELETE", path)
-        return
-
         """
         response = requests.delete(baseurl + "/" + path)
 
@@ -43,10 +78,11 @@ class _Http(object):
             response.raise_for_status()
             #raise Exception("HTTP DELETE {}: Server code {}".format(endpoint, response.status_code))
         """
+        LOG.info("DELETE", path)
+        return
 
 
 class Artifactory(object):
-
     def __init__(self, baseurl, user, passwd):
         self.http = _Http(baseurl, user, passwd)
 
@@ -56,19 +92,19 @@ class Artifactory(object):
         If the optional parameter reponame is specified, then only return
         information pertaining to that repo
         """
-    
+
         repos = {}
-    
+
         json = self.http.get("/storageinfo")
         for repo in json["repositoriesSummaryList"]:
-            if repo["repoKey"] == "TOTAL" :
+            if repo["repoKey"] == "TOTAL":
                 continue
-                
+
             if not reponame or reponame == repo["repoKey"]:
                 repos[repo["repoKey"]] = repo
-    
+
         return repos
-    
+
     def purge(self, repo, dryrun, artifacts):
         """ Purge artifacts from the specified repo
 
@@ -117,24 +153,24 @@ class Artifactory(object):
         terms.append({"depth": {"$eq": depth}})
 
         findexpr = json.dumps({"$and": terms})
-    
+
         aql = "items.find({})".format(findexpr)
-    
+
         if sort:
             aql += ".sort({})".format(json.dumps(sort))
-    
+
         if offset:
             aql += ".offset({})".format(offset)
-    
+
         if limit:
             aql += ".limit({})".format(limit)
-    
+
         LOG.debug("AQL: {}".format(aql))
-    
+
         response = self.http.post("/search/aql", aql)
 
         return response["results"]
-    
+
     def retain(self, repo, specproject, depth, terms=None, count=None, weeks=None):
         if [terms, count, weeks].count(None) != 2:
             raise ValueError("Must specify exactly one of terms, count, or weeks")
@@ -147,16 +183,18 @@ class Artifactory(object):
         purgable = []
 
         for project in self.filter(repo, depth=depth):
-            if specproject and specproject!=project["name"]:
+            if specproject and specproject != project["name"]:
                 continue
 
             path = "{}/{}".format(project["path"], project["name"])
             if count:
-                for artifact in self.filter(repo, offset=count, depth=depth+1, terms=[{"path": path}], sort={"$desc": ["created"]}):
+                for artifact in self.filter(repo, offset=count, depth=depth + 1, terms=[{"path": path}],
+                                            sort={"$desc": ["created"]}):
                     purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
 
             if weeks:
-                for artifact in self.filter(repo, offset=count, depth=depth+1, terms=[{"path": path}, {"created": created}]):
+                for artifact in self.filter(repo, offset=count, depth=depth + 1,
+                                            terms=[{"path": path}, {"created": created}]):
                     purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
 
             if terms:

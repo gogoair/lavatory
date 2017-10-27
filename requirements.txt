@@ -2,4 +2,5 @@ click
 coloredlogs
 requests
 humanfriendly
+party
 pluginbase
