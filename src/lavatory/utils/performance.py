@@ -1,6 +1,6 @@
 import logging
 
-from humanfriendly import parse_size, format_number, format_size
+from humanfriendly import format_number, format_size, parse_size
 
 LOG = logging.getLogger(__name__)
 
@@ -18,14 +18,12 @@ def get_performance_report(repo_name, old_info, new_info):
     old_files = old_info["filesCount"]
     new_files = new_info["filesCount"]
 
-    LOG.info("%s size: %s; reduction: storage %s (%.1f%%), files %s (%.1f%%)",
-            repo_name, 
-            format_size(new_space),
-            format_size(new_space-old_space), 
-            get_percentage(old_space, new_space),
-            format_number(new_files-old_files),
-            get_percentage(old_files, new_files)
-            )
+    LOG.info("%s size: %s; reduction: storage %s (%.1f%%), files %s (%.1f%%)", repo_name,
+             format_size(new_space),
+             format_size(new_space - old_space),
+             get_percentage(old_space, new_space),
+             format_number(new_files - old_files), get_percentage(old_files, new_files))
+
 
 def get_percentage(old, new):
     """Gets percentage from old and new values
@@ -37,6 +35,6 @@ def get_percentage(old, new):
         number: Percentage, or zero if none
     """
     try:
-        return 100*(old-new)/old
+        return 100 * (old - new) / old
     except ZeroDivisionError:
         return 0
