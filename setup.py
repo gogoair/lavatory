@@ -48,6 +48,6 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'lavatory=lavatory.lavatory:purge'
+            'lavatory=lavatory.__main__:root'
             ]},
     )

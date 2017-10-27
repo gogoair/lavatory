@@ -1,10 +1,10 @@
 import datetime
 import json
-from ..utils.logging import getLogger
+import logging
+
 import requests
 
-
-LOG = getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class _Http(object):

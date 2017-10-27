@@ -1,7 +1,9 @@
-from humanfriendly import parse_size, format_number, format_size
-from .logging import getLogger
+import logging
 
-LOG = getLogger(__name__)
+from humanfriendly import parse_size, format_number, format_size
+
+LOG = logging.getLogger(__name__)
+
 
 def get_performance_report(repo_name, old_info, new_info):
     """compares retention policy performance, showing old amount of space and new.

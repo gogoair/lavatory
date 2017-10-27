@@ -1,3 +1,4 @@
+import logging
 import os
 
 import click
@@ -5,20 +6,12 @@ from pluginbase import PluginBase
 
 from .credentials import load_credentials
 from .utils.artifactory import Artifactory
-from .utils.logging import getLogger
 from .utils.performance import get_performance_report
 from .exceptions import InvalidPoliciesDirectory
 
-LOG = getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
-
-@click.command()
-@click.option(
-    '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
-@click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
-@click.option('--policies-path', required=False, help='Path to extra policies directory')
-#@click.argument('url')
-def purge(dryrun, policies_path, default):  #, url):
+def run_purge(dryrun, policies_path, default):
     credentials = load_credentials()
     artifactory = Artifactory(credentials['artifactory_url'], credentials['artifactory_username'],
                               credentials['artifactory_password'])

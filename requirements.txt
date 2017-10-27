@@ -1,4 +1,5 @@
 click
+coloredlogs
 requests
 humanfriendly
 pluginbase
