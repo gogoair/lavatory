@@ -25,17 +25,17 @@ def purge(dryrun, policies_path, default):  #, url):
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     before = artifactory.list(None)
     for repo, info in before.items():
-        plugin_name = repo.replace("-", "_")
+        policy_name = repo.replace("-", "_")
         try:
-            artifactory_plugin = plugin_source.load_plugin(plugin_name)
+            artifactory_policy = plugin_source.load_plugin(policy_name)
         except ModuleNotFoundError:
             if default:
                 LOG.info("No plugin found for %s. Applying Default", repo)
-                artifactory_plugin = plugin_source.load_plugin('default')
+                artifactory_policy = plugin_source.load_plugin('default')
             else:
                 LOG.info("No plugin found for %s. Skipping Default", repo)
                 continue
-        artifacts = artifactory_plugin.purgelist(
+        artifacts = artifactory_policy.purgelist(
             artifactory,
             repo,
             None,
