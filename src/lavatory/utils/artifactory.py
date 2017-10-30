@@ -105,7 +105,12 @@ class Artifactory(object):
 
         return purged
 
+<<<<<<< HEAD
     def filter(self, terms=None, depth=3):
+=======
+       
+    def filter(self, terms=None, depth=3, sort=None, offset=None, limit=None):
+>>>>>>> added count_based_retention function
         """Get a subset of artifacts from the specified repo.
 
         XXX: this looks at the project level, but actually need to iterate lower at project level
@@ -181,3 +186,15 @@ class Artifactory(object):
                 pass
 
         return purgable
+
+    def count_based_retention(retention_count=None, depth=3):
+        """Return all artifacts except the <count> most recent.
+
+        Args:
+            retention_count (int): Number of artifacts to keep
+
+        Returns:
+            list: List of all artifacts to delete
+        """
+        return
+ 
