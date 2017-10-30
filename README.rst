@@ -1,4 +1,5 @@
-|Build Status|
+|Build Status| |Doc Status|
+
 
 Lavatory
 ========
@@ -89,3 +90,6 @@ Testing
 
 .. |Build Status| image:: https://travis-ci.org/gogoair/lavatory.svg?branch=master
    :target: https://travis-ci.org/gogoair/lavatory
+
+.. |Doc Status| image:: https://readthedocs.org/projects/lavatory/badge/?version=latest
+   :target: http://lavatory.readthedocs.io/en/latest/?badge=latest

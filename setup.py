@@ -24,7 +24,7 @@ with open('requirements.txt', 'rt') as reqs_file:
 setup(
     name='lavatory',
     description='Run retention policies against Artifactory repositories',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
     author='Gogo DevOps',
     author_email='ps-devops-tooling@example.com',
     packages=find_packages(where='src'),
