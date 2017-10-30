@@ -17,10 +17,10 @@ LOG = logging.getLogger(__name__)
 @click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
 def purge(ctx, dryrun, policies_path, default):
     """Deletes artifacts based on retention policies"""
-    artifactory = Artifactory()
+    artifactory = Artifactory(repo_name=None)
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
-    before = artifactory.list(None)
+    before = artifactory.list()
     for repo, info in before.items():
         policy_name = repo.replace("-", "_")
         try:
@@ -42,7 +42,7 @@ def purge(ctx, dryrun, policies_path, default):
 
     LOG.info("")
     LOG.info("Purging Performance:")
-    after = artifactory.list(None)
+    after = artifactory.list()
     for repo, info in after.items():
         try:
             get_performance_report(repo, before[repo], info)

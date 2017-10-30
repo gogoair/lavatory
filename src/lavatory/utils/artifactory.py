@@ -16,6 +16,8 @@ class Artifactory(object):
         self.repo_name = repo_name
         self.credentials = load_credentials()
         self.artifactory = party.Party()
+        if not self.credentials['artifactory_url'].endswith('/api'):
+            self.credentials['artifactory_url'] = self.credentials['artifactory_url'] + '/api'
         self.artifactory.artifactory_url = self.credentials['artifactory_url']
         self.artifactory.username = self.credentials['artifactory_username']
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
