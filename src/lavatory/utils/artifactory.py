@@ -49,11 +49,13 @@ class Artifactory(object):
     def all_artifacts(self, search='', depth=3):
         """ Returns a dict of artifact and properties """
         LOG.debug('Finding all artifacts with: search=%s, repo=%s, depth=%s', search, self.repo_name, depth)
-        all_artifacts = {}
 
-        self.artifactory.find_by_pattern(filename=search, specific_repo=self.repo_name, max_depth=depth)
+        all_artifacts = self.artifactory.find_by_pattern(
+            filename=search,
+            specific_repo=self.repo_name,
+            max_depth=depth)
 
-        for artifact in sorted(self.artifactory.files):
+        for artifact in sorted(all_artifacts):
             artifact_simple_name = self._parse_artifact_name(artifact)
             LOG.debug('Found: %s', artifact_simple_name)
             self.artifactory.get_properties(artifact)
