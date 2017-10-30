@@ -16,7 +16,7 @@ Requirements
 -  Artifactory user with API permissions
 
 Authentication
---------------
+~~~~~~~~~~~~~~
 
 This tool looks for 3 enviroment variables in order to authenticate:
 
@@ -30,7 +30,7 @@ These will be loaded in at the beginning of a run and raise an exception
 if missing.
 
 Installing
-----------
+~~~~~~~~~~
 
 From pypi:
 
@@ -45,7 +45,7 @@ Or install directly from the code:
     pip install -U .
 
 Running
--------
+~~~~~~~
 
 ::
 
@@ -62,7 +62,7 @@ Running
       purge  Deletes artifacts based on retention policies
 
 Purging Artifacts
-~~~~~~~~~~~~~~~~~
+-----------------
 
 ``lavatory purge --policies-path=/path/to/policies``
 
@@ -81,7 +81,7 @@ Purging Artifacts
       --help                    Show this message and exit.
 
 Testing
--------
+~~~~~~~
 
 ::
 
