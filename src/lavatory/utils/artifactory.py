@@ -107,12 +107,7 @@ class Artifactory(object):
 
         return purged
 
-<<<<<<< HEAD
-    def filter(self, terms=None, depth=3):
-=======
-       
-    def filter(self, terms=None, depth=3, sort=None, offset=None, limit=None):
->>>>>>> added count_based_retention function
+    def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0):
         """Get a subset of artifacts from the specified repo.
 
         XXX: this looks at the project level, but actually need to iterate lower at project level
@@ -137,34 +132,19 @@ class Artifactory(object):
         terms.append({"type": {"$eq": "folder"}})
         terms.append({"depth": {"$eq": depth}})
 
-<<<<<<< HEAD
         aql = {"$and": terms}
-=======
-        find_expr = {"$and": terms}
 
-        #aql = "items.find({})".format(find_expr)
-        aql= find_expr
-
-        if sort:
-            aql += ".sort({})".format(json.dumps(sort))
-
-        if offset:
-            aql += ".offset({})".format(offset)
-
-        if limit:
-            aql += ".limit({})".format(limit)
->>>>>>> abstracted out count_based_retention code
-
-        LOG.debug("AQL: %s", aql)
-
-        response = self.artifactory.find_by_aql(criteria=aql, fields=['stat'])
+        LOG.debug("AQL: {}".format(aql))
+        response = self.artifactory.find_by_aql(criteria=aql,
+                                                order_and_fields=sort,
+                                                offset_records=offset,
+                                                num_records=limit)
 
         results = response['results']
 
         return results
 
-<<<<<<< HEAD
-    def retain(self, spec_project, depth=3, terms=None, count=None, weeks=None):
+    def retain(self, spec_project, depth=3, terms=None, weeks=None):
         """Returns purgable artifacts.
 
         Args:
@@ -177,10 +157,7 @@ class Artifactory(object):
         Returns:
             purgable (list): Purgable.
         """
-=======
-    def retain(self, spec_project, depth=3, terms=None, weeks=None):
->>>>>>> abstracted out count_based_retention code
-        if [terms, count, weeks].count(None) != 2:
+        if [terms, weeks].count(None) != 1:
             raise ValueError("Must specify exactly one of terms, count, or weeks")
 
         purgable = []
@@ -190,15 +167,6 @@ class Artifactory(object):
                 continue
 
             path = "{}/{}".format(project["path"], project["name"])
-<<<<<<< HEAD
-            if count:
-                filtered = self.filter(depth=depth + 1, terms=[{"path": path}])
-
-                for artifact in filtered:
-                    purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
-
-=======
->>>>>>> abstracted out count_based_retention code
             if weeks:
                 now = datetime.datetime.now()
                 before = now - datetime.timedelta(weeks=weeks)
@@ -210,24 +178,30 @@ class Artifactory(object):
             if terms:
                 pass
 
-        return purgable
-
-    def count_based_retention(self, retention_count=None, depth=3):
+        return sorted(purgable)
+    
+    def count_based_retention(self, retention_count=None, depth=2):
         """Return all artifacts except the <count> most recent.
 
         Args:
-            retention_count (int): Number of artifacts to keep
+            retention_count (int): Number of artifacts to keep.
+            depth (int):  how far down the Artifactory older hierarchy to look.
 
         Returns:
-            list: List of all artifacts to delete
+            list: List of all artifacts to delete.
         """
         purgable = []
-        for artifact in self.filter(
-                offset=retention_count,
-                depth=depth + 1,
-                sort={"$desc": ["created"]}):
-            purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
-
-        return purgable
+        LOG.info("Searching for purgable artifacts in %s.", self.repo_name)
+        for project in self.filter(depth=depth):
+            LOG.debug("Processing artifacts for project %s", project)
+            path = "{}/{}".format(project["path"], project["name"])
+            for artifact in self.filter(
+                    offset=retention_count,
+                    depth=depth + 1,
+                    terms=[{"path": path}],
+                    sort={"$desc": ["created"]}):
+                purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
+        
+        return sorted(purgable)
                 
  

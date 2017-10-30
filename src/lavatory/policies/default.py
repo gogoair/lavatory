@@ -1,6 +1,4 @@
 
 def purgelist(artifactory):
-    return artifactory.retain(None, depth=2, terms=[
-            {"$or": [
-                ]}
-        ])
+    purgable = artifactory.count_based_retention(retention_count=5)
+    return purgable
