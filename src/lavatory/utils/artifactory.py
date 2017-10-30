@@ -9,25 +9,23 @@ from ..credentials import load_credentials
 
 LOG = logging.getLogger(__name__)
 
-CREDENTIALS = load_credentials()
-
-PARTY_CONFIG = {
-    'artifactory_url': CREDENTIALS['artifactory_url'],
-    'username': CREDENTIALS['artifactory_username'],
-    'password': base64.encodebytes(bytes(CREDENTIALS['artifactory_password'], 'utf-8')),
-}
-
 
 class Artifactory(object):
 
-    artifactory = party.Party(PARTY_CONFIG)
+    def __init__(self, repo_name=None):
+        self.repo_name = repo_name
+        self.credentials = load_credentials()
+        self.artifactory = party.Party()
+        self.artifactory.artifactory_url = self.credentials['artifactory_url']
+        self.artifactory.username = self.credentials['artifactory_username']
+        self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
 
     @staticmethod
     def _parse_artifact_name(name):
         simple_name = '/'.join(name.split('/')[-4:])
         return simple_name
 
-    def list(self, repo_name=None):
+    def list(self):
         """
         Return a list of repos with basic info about each
         If the optional parameter repo_name is specified, then only return
@@ -42,7 +40,7 @@ class Artifactory(object):
             if repo["repoKey"] == "TOTAL":
                 continue
 
-            if not repo_name or repo_name == repo["repoKey"]:
+            if not self.repo_name or self.repo_name == repo["repoKey"]:
                 repos[repo["repoKey"]] = repo
 
         return repos
