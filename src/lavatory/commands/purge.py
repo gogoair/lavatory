@@ -23,6 +23,7 @@ def purge(ctx, dryrun, policies_path, default):
     before = artifactory.list()
     for repo, info in before.items():
         policy_name = repo.replace("-", "_")
+        artifactory_repo = Artifactory(repo_name=repo)
         try:
             policy = plugin_source.load_plugin(policy_name)
         except ModuleNotFoundError:
@@ -33,11 +34,9 @@ def purge(ctx, dryrun, policies_path, default):
                 LOG.info("No policy found for %s. Skipping Default", repo)
                 continue
         artifacts = policy.purgelist(
-            artifactory,
-            repo,
-            None,
+            artifactory_repo
         )
-        count = artifactory.purge(repo, dryrun, artifacts)
+        count = artifactory_repo.purge(dryrun, artifacts)
         LOG.info("Processed {}, Purged {}".format(repo, count))
 
     LOG.info("")

@@ -127,13 +127,13 @@ class Artifactory(object):
 
         LOG.debug("AQL: {}".format(aql))
 
-        response = self.artifactory.find_by_aql(criteria=aql)
+        response = self.artifactory.find_by_aql(criteria=aql, fields=['stat'])
 
         results = response['results']
 
         return results
 
-    def retain(self, spec_project, depth, terms=None, count=None, weeks=None):
+    def retain(self, spec_project, depth=3, terms=None, count=None, weeks=None):
         if [terms, count, weeks].count(None) != 2:
             raise ValueError("Must specify exactly one of terms, count, or weeks")
 
