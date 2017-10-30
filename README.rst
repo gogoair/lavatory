@@ -60,6 +60,7 @@ Running
 
     Commands:
       purge  Deletes artifacts based on retention policies
+      version  Print version information.
 
 Purging Artifacts
 -----------------
