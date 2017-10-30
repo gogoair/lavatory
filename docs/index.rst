@@ -3,14 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Lavatory's documentation!
+.. _home:
+
+Welcome to lavatory's documentation!
 ====================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :titlesonly:
+   CHANGELOG
 
-
+.. include:: ../README.rst
 
 Indices and tables
 ==================
