@@ -2,6 +2,8 @@
 import base64
 import datetime
 import logging
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import certifi
 import party
@@ -135,7 +137,23 @@ class Artifactory(object):
         terms.append({"type": {"$eq": "folder"}})
         terms.append({"depth": {"$eq": depth}})
 
+<<<<<<< HEAD
         aql = {"$and": terms}
+=======
+        find_expr = {"$and": terms}
+
+        #aql = "items.find({})".format(find_expr)
+        aql= find_expr
+
+        if sort:
+            aql += ".sort({})".format(json.dumps(sort))
+
+        if offset:
+            aql += ".offset({})".format(offset)
+
+        if limit:
+            aql += ".limit({})".format(limit)
+>>>>>>> abstracted out count_based_retention code
 
         LOG.debug("AQL: %s", aql)
 
@@ -145,6 +163,7 @@ class Artifactory(object):
 
         return results
 
+<<<<<<< HEAD
     def retain(self, spec_project, depth=3, terms=None, count=None, weeks=None):
         """Returns purgable artifacts.
 
@@ -158,6 +177,9 @@ class Artifactory(object):
         Returns:
             purgable (list): Purgable.
         """
+=======
+    def retain(self, spec_project, depth=3, terms=None, weeks=None):
+>>>>>>> abstracted out count_based_retention code
         if [terms, count, weeks].count(None) != 2:
             raise ValueError("Must specify exactly one of terms, count, or weeks")
 
@@ -168,12 +190,15 @@ class Artifactory(object):
                 continue
 
             path = "{}/{}".format(project["path"], project["name"])
+<<<<<<< HEAD
             if count:
                 filtered = self.filter(depth=depth + 1, terms=[{"path": path}])
 
                 for artifact in filtered:
                     purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
 
+=======
+>>>>>>> abstracted out count_based_retention code
             if weeks:
                 now = datetime.datetime.now()
                 before = now - datetime.timedelta(weeks=weeks)
@@ -187,7 +212,7 @@ class Artifactory(object):
 
         return purgable
 
-    def count_based_retention(retention_count=None, depth=3):
+    def count_based_retention(self, retention_count=None, depth=3):
         """Return all artifacts except the <count> most recent.
 
         Args:
@@ -196,5 +221,13 @@ class Artifactory(object):
         Returns:
             list: List of all artifacts to delete
         """
-        return
+        purgable = []
+        for artifact in self.filter(
+                offset=retention_count,
+                depth=depth + 1,
+                sort={"$desc": ["created"]}):
+            purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
+
+        return purgable
+                
  
