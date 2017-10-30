@@ -139,7 +139,7 @@ class Artifactory(object):
 
         purgable = []
 
-        for project in self.filter(self.repo_name, depth=depth):
+        for project in self.filter(depth=depth):
             if spec_project and spec_project != project["name"]:
                 continue
 
