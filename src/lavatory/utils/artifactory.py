@@ -24,13 +24,23 @@ class Artifactory(object):
 
     @staticmethod
     def _parse_artifact_name(name):
-        """Artifact name parser."""
+        """Artifact name parser.
+
+        Args:
+            name (str): Long name.
+
+        Returns:
+            simple_name (str): Simple name.
+        """
         simple_name = '/'.join(name.split('/')[-4:])
         return simple_name
 
     def list(self):
         """
-        Return a list of repos with basic info about each.
+        Return a dictionary of repos with basic info about each.
+
+        Returns:
+            repos (dict): Dictionary of repos.
         """
 
         repos = {}
