@@ -107,18 +107,20 @@ class Artifactory(object):
 
         return purged
 
-    def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0):
+       
+    def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0, item_type="folder"):
         """Get a subset of artifacts from the specified repo.
 
         XXX: this looks at the project level, but actually need to iterate lower at project level
         XXX: almost certainly needs to set depth parameter to get to specific build
 
-        Args:
-            terms (list): AQL terms.
-            depth (int): Depth level.
-
-        Returns:
-            results: Results from aql search.
+        Keyword arguments:
+        repo -- the repo to target for this operation
+        terms -- an array of jql snippets that will be ANDed together
+        depth -- how far down the folder hierarchy to look
+        offset -- how many items from the beginning of the list should be skipped (optional)
+        limit -- the maximum number of entries to return (optional)
+        item_type (str): The itme type to search for (file/folder/any).
 
         This method does not use pagination. It assumes that this utility
         will be called on a repo sufficiently frequently that removing just
@@ -129,7 +131,7 @@ class Artifactory(object):
             terms = []
 
         terms.append({"repo": {"$eq": self.repo_name}})
-        terms.append({"type": {"$eq": "folder"}})
+        terms.append({"type": {"$eq": item_type}})
         terms.append({"depth": {"$eq": depth}})
 
         aql = {"$and": terms}
@@ -179,13 +181,14 @@ class Artifactory(object):
                 pass
 
         return sorted(purgable)
-    
-    def count_based_retention(self, retention_count=None, depth=2):
+
+    def count_based_retention(self, retention_count=None, depth=2, item_type='folder'):
         """Return all artifacts except the <count> most recent.
 
         Args:
             retention_count (int): Number of artifacts to keep.
             depth (int):  how far down the Artifactory older hierarchy to look.
+            item_type (str): The itme type to search for (file/folder/any).
 
         Returns:
             list: List of all artifacts to delete.
@@ -197,6 +200,7 @@ class Artifactory(object):
             path = "{}/{}".format(project["path"], project["name"])
             for artifact in self.filter(
                     offset=retention_count,
+                    item_type=item_type,
                     depth=depth + 1,
                     terms=[{"path": path}],
                     sort={"$desc": ["created"]}):
