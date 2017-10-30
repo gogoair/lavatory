@@ -2,7 +2,6 @@ import logging
 
 import click
 
-from ..credentials import load_credentials
 from ..utils.artifactory import Artifactory
 from ..utils.performance import get_performance_report
 from ..utils.setup_pluginbase import setup_pluginbase
@@ -18,9 +17,7 @@ LOG = logging.getLogger(__name__)
 @click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
 def purge(ctx, dryrun, policies_path, default):
     """Deletes artifacts based on retention policies"""
-    credentials = load_credentials()
-    artifactory = Artifactory(credentials['artifactory_url'], credentials['artifactory_username'],
-                              credentials['artifactory_password'])
+    artifactory = Artifactory()
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     before = artifactory.list(None)

@@ -2,10 +2,10 @@ import base64
 import datetime
 import json
 import logging
-from ..credentials import load_credentials
 
-import requests
 import party
+
+from ..credentials import load_credentials
 
 LOG = logging.getLogger(__name__)
 
@@ -14,123 +14,79 @@ CREDENTIALS = load_credentials()
 PARTY_CONFIG = {
     'artifactory_url': CREDENTIALS['artifactory_url'],
     'username': CREDENTIALS['artifactory_username'],
-    'password': base64.encodebytes(CREDENTIALS['artifactory_password']),
+    'password': base64.encodebytes(bytes(CREDENTIALS['artifactory_password'], 'utf-8')),
 }
 
 
-def artifactory_auth():
-    decode_password = base64.decodebytes(PARTY_CONFIG.get('password'))
-    auth = (PARTY_CONFIG.get('username'), decode_password)
-    return auth
-
-
-def _parse_artifact_name(name):
-    simple_name = '/'.join(name.split('/')[-4:])
-    return simple_name
-
-
-def artifacts(search='*rpm', repo='ext-release-local', depth=3, **kwargs):
-    """ Returns a dict of artifact and properties """
-    LOG.debug('Finding all artifacts with: search=%s, repo=%s, depth=%s', search, repo, depth)
-    all_artifacts = {}
-    artifactory = party.Party(PARTY_CONFIG)
-    artifactory.find_by_pattern(filename=search, specific_repo=repo, max_depth=depth)
-
-    for artifact in sorted(artifactory.files):
-        artifact_simple_name = _parse_artifact_name(artifact)
-        LOG.debug('Found: %s', artifact_simple_name)
-        artifactory.get_properties(artifact)
-        all_artifacts.update({artifact: artifactory.properties})
-
-    LOG.info('Found %d artifacts in total.', len(all_artifacts))
-    return all_artifacts
-
-
-class _Http(object):
-    def __init__(self, baseurl, user, passwd):
-        self.baseurl = baseurl
-        self.apiurl = baseurl + "/api"
-        self.auth = (user, passwd)
-
-    def get(self, endpoint):
-        response = requests.get(self.apiurl + endpoint, auth=self.auth)
-
-        if response.ok:
-            return response.json()
-        else:
-            response.raise_for_status()
-
-    def post(self, endpoint, payload):
-        response = requests.post(self.apiurl + endpoint, auth=self.auth, data=payload)
-
-        if response.ok:
-            return response.json()
-        else:
-            response.raise_for_status()
-
-    def delete(self, path):
-        """
-        response = requests.delete(baseurl + "/" + path)
-
-        if response.ok:
-            return response.json()
-        else:
-            response.raise_for_status()
-            #raise Exception("HTTP DELETE {}: Server code {}".format(endpoint, response.status_code))
-        """
-        LOG.info("DELETE", path)
-        return
-
-
 class Artifactory(object):
-    def __init__(self, baseurl, user, passwd):
-        self.http = _Http(baseurl, user, passwd)
 
-    def list(self, reponame=None):
+    artifactory = party.Party(PARTY_CONFIG)
+
+    @staticmethod
+    def _parse_artifact_name(name):
+        simple_name = '/'.join(name.split('/')[-4:])
+        return simple_name
+
+    def list(self, repo_name=None):
         """
         Return a list of repos with basic info about each
-        If the optional parameter reponame is specified, then only return
+        If the optional parameter repo_name is specified, then only return
         information pertaining to that repo
         """
 
         repos = {}
 
-        json = self.http.get("/storageinfo")
-        for repo in json["repositoriesSummaryList"]:
+        raw_data = self.artifactory.request('storageinfo')
+        data = raw_data.json()
+        for repo in data["repositoriesSummaryList"]:
             if repo["repoKey"] == "TOTAL":
                 continue
 
-            if not reponame or reponame == repo["repoKey"]:
+            if not repo_name or repo_name == repo["repoKey"]:
                 repos[repo["repoKey"]] = repo
 
         return repos
 
-    def purge(self, repo, dryrun, artifacts):
+    def all_artifacts(self, search='', repo='', depth=3):
+        """ Returns a dict of artifact and properties """
+        LOG.debug('Finding all artifacts with: search=%s, repo=%s, depth=%s', search, repo, depth)
+        all_artifacts = {}
+
+        self.artifactory.find_by_pattern(filename=search, specific_repo=repo, max_depth=depth)
+
+        for artifact in sorted(self.artifactory.files):
+            artifact_simple_name = self._parse_artifact_name(artifact)
+            LOG.debug('Found: %s', artifact_simple_name)
+            self.artifactory.get_properties(artifact)
+
+        LOG.info('Found %d artifacts in total.', len(all_artifacts))
+        return all_artifacts
+
+    def purge(self, repo, dry_run, artifacts):
         """ Purge artifacts from the specified repo
 
         Keyword arguments:
         repo -- the repo to target for this operation
-        dryrun -- false to execute an actual purge
+        dry_run -- false to execute an actual purge
         artifacts -- a list of artifacts to operate upon
         """
-
         purged = 0
-        mode = "DRYRUN" if dryrun else "LIVE"
+        mode = "DRYRUN" if dry_run else "LIVE"
 
         for artifact in artifacts:
             LOG.info("  {} purge {}:{}".format(mode, repo, artifact))
-            if dryrun:
+            if dry_run:
                 purged += 1
             else:
                 try:
-                    self.http.delete(artifact)
+                    self.artifactory.request(artifact, method='delete')
                     purged += 1
                 except Exception as e:
                     LOG.error(str(e))
 
         return purged
 
-    def filter(self, repo, terms=[], depth=3, sort=None, offset=None, limit=None):
+    def filter(self, repo, terms=None, depth=3, sort=None, offset=None, limit=None):
         """Get a subset of artifacts from the specified repo.
 
         XXX: this looks at the project level, but actually need to iterate lower at project level
@@ -148,13 +104,16 @@ class Artifactory(object):
         the default n items will be enough.
         """
 
+        if terms is None:
+            terms = []
+
         terms.append({"repo": {"$eq": repo}})
         terms.append({"type": {"$eq": "folder"}})
         terms.append({"depth": {"$eq": depth}})
 
-        findexpr = json.dumps({"$and": terms})
+        find_expr = json.dumps({"$and": terms})
 
-        aql = "items.find({})".format(findexpr)
+        aql = "items.find({})".format(find_expr)
 
         if sort:
             aql += ".sort({})".format(json.dumps(sort))
@@ -167,34 +126,39 @@ class Artifactory(object):
 
         LOG.debug("AQL: {}".format(aql))
 
-        response = self.http.post("/search/aql", aql)
+        response = self.artifactory.find_by_aql(criteria=aql)
 
         return response["results"]
 
-    def retain(self, repo, specproject, depth, terms=None, count=None, weeks=None):
+    def retain(self, repo, spec_project, depth, terms=None, count=None, weeks=None):
         if [terms, count, weeks].count(None) != 2:
             raise ValueError("Must specify exactly one of terms, count, or weeks")
-
-        if weeks:
-            now = datetime.datetime.now()
-            before = now - datetime.timedelta(weeks=weeks)
-            created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         purgable = []
 
         for project in self.filter(repo, depth=depth):
-            if specproject and specproject != project["name"]:
+            if spec_project and spec_project != project["name"]:
                 continue
 
             path = "{}/{}".format(project["path"], project["name"])
             if count:
-                for artifact in self.filter(repo, offset=count, depth=depth + 1, terms=[{"path": path}],
-                                            sort={"$desc": ["created"]}):
+                for artifact in self.filter(
+                        repo, offset=count, depth=depth + 1, terms=[{
+                            "path": path
+                        }], sort={"$desc": ["created"]}):
                     purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
 
             if weeks:
-                for artifact in self.filter(repo, offset=count, depth=depth + 1,
-                                            terms=[{"path": path}, {"created": created}]):
+                now = datetime.datetime.now()
+                before = now - datetime.timedelta(weeks=weeks)
+                created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+                for artifact in self.filter(
+                        repo, offset=count, depth=depth + 1, terms=[{
+                            "path": path
+                        }, {
+                            "created": created
+                        }]):
                     purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
 
             if terms:
