@@ -112,18 +112,7 @@ class Artifactory(object):
         terms.append({"type": {"$eq": "folder"}})
         terms.append({"depth": {"$eq": depth}})
 
-        find_expr = json.dumps({"$and": terms})
-
-        aql = "items.find({})".format(find_expr)
-
-        if sort:
-            aql += ".sort({})".format(json.dumps(sort))
-
-        if offset:
-            aql += ".offset({})".format(offset)
-
-        if limit:
-            aql += ".limit({})".format(limit)
+        aql = {"$and": terms}
 
         LOG.debug("AQL: {}".format(aql))
 
