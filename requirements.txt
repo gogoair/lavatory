@@ -1,3 +1,5 @@
+-r docs/requirements-docs.txt
+
 click
 coloredlogs
 requests
