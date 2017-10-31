@@ -21,7 +21,8 @@ def purge(ctx, dryrun, policies_path, default):
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     before = artifactory.list()
-    for repo, info in before.items():
+    #for repo, info in before.items():
+    for repo in ['yum-local']:
         policy_name = repo.replace("-", "_")
         artifactory_repo = Artifactory(repo_name=repo)
         try:

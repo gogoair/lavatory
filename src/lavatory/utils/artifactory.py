@@ -95,12 +95,13 @@ class Artifactory(object):
         mode = "DRYRUN" if dry_run else "LIVE"
 
         for artifact in artifacts:
-            LOG.info("%s purge %s:%s", (mode, self.repo_name, artifact))
+            artifact_path = "{}/{}".format(artifact['path'], artifact['name'])
+            LOG.info("  {} purge {}:{}".format(mode, self.repo_name, artifact_path))
             if dry_run:
                 purged += 1
             else:
                 try:
-                    self.artifactory.request(artifact, method='delete')
+                    self.artifactory.request(artifact_path, method='delete')
                     purged += 1
                 except Exception as error:
                     LOG.error(str(error))
@@ -132,7 +133,8 @@ class Artifactory(object):
 
         terms.append({"repo": {"$eq": self.repo_name}})
         terms.append({"type": {"$eq": item_type}})
-        terms.append({"depth": {"$eq": depth}})
+        if depth:
+            terms.append({"depth": {"$eq": depth}})
 
         aql = {"$and": terms}
 
@@ -162,8 +164,7 @@ class Artifactory(object):
         if [terms, weeks].count(None) != 1:
             raise ValueError("Must specify exactly one of terms, count, or weeks")
 
-        purgable = []
-
+        purgable_artifacts = []
         for project in self.filter(depth=depth):
             if spec_project and spec_project != project["name"]:
                 continue
@@ -173,16 +174,23 @@ class Artifactory(object):
                 now = datetime.datetime.now()
                 before = now - datetime.timedelta(weeks=weeks)
                 created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
-                filtered = self.filter(depth=depth + 1, terms=[{"path": path}, {"created": created}])
-                for artifact in filtered:
-                    purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
 
+                purgable_artifacts.extend(self.filter(offset=count, depth=depth + 1,
+                                                terms=[{
+                                                    "path": path
+                                                    }, {
+                                                    "created": created
+                                                    }]))
             if terms:
                 pass
 
-        return sorted(purgable)
+        return purgable_artifacts
 
-    def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3 item_type='folder'):
+    def get_all_repo_artifacts(depth=None, item_type='file'):
+        """returns all artifacts in a repo with metadata"""
+        return
+
+    def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
         """Return all artifacts except the <count> most recent.
 
         Args:
@@ -194,19 +202,17 @@ class Artifactory(object):
         Returns:
             list: List of all artifacts to delete.
         """
-        purgable = []
+        purgable_artifacts = []
         LOG.info("Searching for purgable artifacts in %s.", self.repo_name)
         for project in self.filter(depth=project_depth):
             LOG.debug("Processing artifacts for project %s", project)
             path = "{}/{}".format(project["path"], project["name"])
-            for artifact in self.filter(
-                    offset=retention_count,
-                    item_type=item_type,
-                    depth=artifact_depth,
-                    terms=[{"path": path}],
-                    sort={"$desc": ["created"]}):
-                purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
+            purgable_artifacts.extend(self.filter(offset=retention_count,
+                                            item_type=item_type,
+                                            depth=artifact_depth,
+                                            terms=[{"path": path}],
+                                            sort={"$desc": ["created"]}))
         
-        return sorted(purgable)
+        return sorted(purgable_artifacts, key=lambda k: k['path'])
                 
  
