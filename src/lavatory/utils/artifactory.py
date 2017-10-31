@@ -13,6 +13,7 @@ LOG = logging.getLogger(__name__)
 
 class Artifactory(object):
     """Artifactory purger class."""
+
     def __init__(self, repo_name=None):
         self.repo_name = repo_name
         self.credentials = load_credentials()
@@ -106,7 +107,6 @@ class Artifactory(object):
 
         return purged
 
-       
     def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0, item_type="folder"):
         """Get a subset of artifacts from the specified repo.
 
@@ -137,10 +137,8 @@ class Artifactory(object):
         aql = {"$and": terms}
 
         LOG.debug("AQL: {}".format(aql))
-        response = self.artifactory.find_by_aql(criteria=aql,
-                                                order_and_fields=sort,
-                                                offset_records=offset,
-                                                num_records=limit)
+        response = self.artifactory.find_by_aql(
+            criteria=aql, order_and_fields=sort, offset_records=offset, num_records=limit)
 
         results = response['results']
 
@@ -173,17 +171,16 @@ class Artifactory(object):
                 before = now - datetime.timedelta(weeks=weeks)
                 created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-                purgable_artifacts.extend(self.filter(offset=count, depth=depth + 1,
-                                                terms=[{
-                                                    "path": path
-                                                    }, {
-                                                    "created": created
-                                                    }]))
+                purgable_artifacts.extend(
+                    self.filter(offset=count, depth=depth + 1, terms=[{
+                        "path": path
+                    }, {
+                        "created": created
+                    }]))
             if terms:
                 pass
 
         return purgable_artifacts
-
 
     def get_all_repo_artifacts(self, depth=None, item_type='file'):
         """returns all artifacts in a repo with metadata
@@ -198,7 +195,6 @@ class Artifactory(object):
         LOG.info("Searching for all artifacts in %s.", self.repo_name)
         artifacts = self.filter(item_type=item_type, depth=depth)
         return sorted(artifacts, key=lambda k: k['path'])
-
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
         """Return all artifacts except the <count> most recent.
@@ -217,12 +213,16 @@ class Artifactory(object):
         for project in self.filter(depth=project_depth):
             LOG.debug("Processing artifacts for project %s", project)
             path = "{}/{}".format(project["path"], project["name"])
-            purgable_artifacts.extend(self.filter(offset=retention_count,
-                                            item_type=item_type,
-                                            depth=artifact_depth,
-                                            terms=[{"path": path}],
-                                            sort={"$desc": ["created"]}))
-        
+            purgable_artifacts.extend(
+                self.filter(
+                    offset=retention_count,
+                    item_type=item_type,
+                    depth=artifact_depth,
+                    terms=[{
+                        "path": path
+                    }],
+                    sort={
+                        "$desc": ["created"]
+                    }))
+
         return sorted(purgable_artifacts, key=lambda k: k['path'])
-                
- 
