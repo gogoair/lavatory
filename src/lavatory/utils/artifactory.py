@@ -3,6 +3,7 @@ import base64
 import datetime
 import logging
 
+import certifi
 import party
 
 from ..credentials import load_credentials
@@ -21,6 +22,7 @@ class Artifactory(object):
         self.artifactory.artifactory_url = self.credentials['artifactory_url']
         self.artifactory.username = self.credentials['artifactory_username']
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
+        self.artifactory.certbundle = certifi.where()
 
     @staticmethod
     def _parse_artifact_name(name):
@@ -46,7 +48,7 @@ class Artifactory(object):
 
         raw_data = self.artifactory.get('storageinfo')
         data = raw_data.json()
-        LOG.debug('Storageinfo data: %s', data)
+        LOG.debug('Storage info data: %s', data)
         for repo in data["repositoriesSummaryList"]:
             if repo["repoKey"] == "TOTAL":
                 continue

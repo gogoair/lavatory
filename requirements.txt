@@ -1,5 +1,6 @@
 click
 coloredlogs
+certifi
 requests
 humanfriendly
 party
