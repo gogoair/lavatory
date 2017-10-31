@@ -171,12 +171,7 @@ class Artifactory(object):
                 before = now - datetime.timedelta(weeks=weeks)
                 created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-                purgable_artifacts.extend(
-                    self.filter(depth=depth + 1, terms=[{
-                        "path": path
-                    }, {
-                        "created": created
-                    }]))
+                purgable_artifacts.extend(self.filter(depth=depth + 1, terms=[{"path": path}, {"created": created}]))
             if terms:
                 pass
 
