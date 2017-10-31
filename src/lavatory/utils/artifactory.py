@@ -182,12 +182,13 @@ class Artifactory(object):
 
         return sorted(purgable)
 
-    def count_based_retention(self, retention_count=None, depth=2, item_type='folder'):
+    def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3 item_type='folder'):
         """Return all artifacts except the <count> most recent.
 
         Args:
             retention_count (int): Number of artifacts to keep.
-            depth (int):  how far down the Artifactory older hierarchy to look.
+            project_depth (int):  how far down the Artifactory folder hierarchy to look for projects.
+            artifact_depth (int):  how far down the Artifactory folder hierarchy to look for specific artifacts.
             item_type (str): The itme type to search for (file/folder/any).
 
         Returns:
@@ -195,13 +196,13 @@ class Artifactory(object):
         """
         purgable = []
         LOG.info("Searching for purgable artifacts in %s.", self.repo_name)
-        for project in self.filter(depth=depth):
+        for project in self.filter(depth=project_depth):
             LOG.debug("Processing artifacts for project %s", project)
             path = "{}/{}".format(project["path"], project["name"])
             for artifact in self.filter(
                     offset=retention_count,
                     item_type=item_type,
-                    depth=depth + 1,
+                    depth=artifact_depth,
                     terms=[{"path": path}],
                     sort={"$desc": ["created"]}):
                 purgable.append("{}/{}".format(artifact["path"], artifact["name"]))
