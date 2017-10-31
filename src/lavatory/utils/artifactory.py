@@ -186,9 +186,21 @@ class Artifactory(object):
 
         return purgable_artifacts
 
-    def get_all_repo_artifacts(depth=None, item_type='file'):
-        """returns all artifacts in a repo with metadata"""
-        return
+
+    def get_all_repo_artifacts(self, depth=None, item_type='file'):
+        """returns all artifacts in a repo with metadata
+        
+        Args:
+            depth (int): How far down Artifactory folder to look. None will go to bottom of folder.
+            item_type (str): The item type to search for (file/folder/any)
+        
+        Returns:
+            list: Sorted list of all artifacts in a repository
+        """
+        LOG.info("Searching for all artifacts in %s.", self.repo_name)
+        artifacts = self.filter(item_type=item_type, depth=depth)
+        return sorted(artifacts, key=lambda k: k['path'])
+
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
         """Return all artifacts except the <count> most recent.
@@ -197,13 +209,13 @@ class Artifactory(object):
             retention_count (int): Number of artifacts to keep.
             project_depth (int):  how far down the Artifactory folder hierarchy to look for projects.
             artifact_depth (int):  how far down the Artifactory folder hierarchy to look for specific artifacts.
-            item_type (str): The itme type to search for (file/folder/any).
+            item_type (str): The item type to search for (file/folder/any).
 
         Returns:
             list: List of all artifacts to delete.
         """
         purgable_artifacts = []
-        LOG.info("Searching for purgable artifacts in %s.", self.repo_name)
+        LOG.info("Searching for purgable artifacts with count based retention in %s.", self.repo_name)
         for project in self.filter(depth=project_depth):
             LOG.debug("Processing artifacts for project %s", project)
             path = "{}/{}".format(project["path"], project["name"])
