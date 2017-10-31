@@ -5,11 +5,13 @@ import pytest
 from lavatory.exceptions import MissingEnvironmentVariable
 from lavatory.credentials import load_credentials
 
+
 def test_missing_credentials_exception(monkeypatch):
     """Tests that an exception is raised if environment variable is missing"""
     monkeypatch.setenv('ARTIFACTORY_URL', None)
     with pytest.raises(MissingEnvironmentVariable):
         load_credentials()
+
 
 def test_load_credentials(monkeypatch):
     """Tests that the right environment variables are loaded and returned"""
@@ -20,4 +22,3 @@ def test_load_credentials(monkeypatch):
     assert credentials == {'artifactory_password': 'test_password',
                            'artifactory_url': 'test_url',
                            'artifactory_username': 'test_username'}
-

@@ -42,17 +42,16 @@ class Artifactory(object):
         Returns:
             repos (dict): Dictionary of repos.
         """
-
         repos = {}
 
-        raw_data = self.artifactory.request('storageinfo')
+        raw_data = self.artifactory.get('storageinfo')
         data = raw_data.json()
+        LOG.debug('Storageinfo data: %s', data)
         for repo in data["repositoriesSummaryList"]:
             if repo["repoKey"] == "TOTAL":
                 continue
 
-            if not self.repo_name or self.repo_name == repo["repoKey"]:
-                repos[repo["repoKey"]] = repo
+            repos[repo["repoKey"]] = repo
 
         return repos
 
