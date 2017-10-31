@@ -100,7 +100,7 @@ class Artifactory(object):
                 purged += 1
             else:
                 try:
-                    self.artifactory.request(artifact_path, method='delete')
+                    self.artifactory.delete(artifact_path)
                     purged += 1
                 except Exception as error:
                     LOG.error(str(error))
@@ -109,21 +109,22 @@ class Artifactory(object):
 
     def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0, item_type="folder"):
         """Get a subset of artifacts from the specified repo.
-
-        XXX: this looks at the project level, but actually need to iterate lower at project level
-        XXX: almost certainly needs to set depth parameter to get to specific build
-
-        Keyword arguments:
-        repo -- the repo to target for this operation
-        terms -- an array of jql snippets that will be ANDed together
-        depth -- how far down the folder hierarchy to look
-        offset -- how many items from the beginning of the list should be skipped (optional)
-        limit -- the maximum number of entries to return (optional)
-        item_type (str): The itme type to search for (file/folder/any).
+        This looks at the project level, but actually need to iterate lower at project level
 
         This method does not use pagination. It assumes that this utility
         will be called on a repo sufficiently frequently that removing just
         the default n items will be enough.
+
+        Args
+            terms (list): an array of jql snippets that will be ANDed together
+            depth (int): how far down the folder hierarchy to look
+            sort (dict): How to sort Artifactory results
+            offset (int): how many items from the beginning of the list should be skipped (optional)
+            limit (int): the maximum number of entries to return (optional)
+            item_type (str): The itme type to search for (file/folder/any).
+
+        Returns:
+            list: List of artifacts returned from query
         """
 
         if terms is None:
@@ -151,7 +152,6 @@ class Artifactory(object):
             spec_project: Spec_project
             depth (int): Depth level.
             terms: Terms for filter.
-            count (int): Count.
             weeks: Number of weeks.
 
         Returns:
@@ -172,7 +172,7 @@ class Artifactory(object):
                 created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
 
                 purgable_artifacts.extend(
-                    self.filter(offset=count, depth=depth + 1, terms=[{
+                    self.filter(depth=depth + 1, terms=[{
                         "path": path
                     }, {
                         "created": created
