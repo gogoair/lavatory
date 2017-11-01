@@ -17,10 +17,13 @@ class Artifactory(object):
     def __init__(self, repo_name=None):
         self.repo_name = repo_name
         self.credentials = load_credentials()
+        self.base_url = credentials['artifactory_url']
         self.artifactory = party.Party()
-        if not self.credentials['artifactory_url'].endswith('/api'):
-            self.credentials['artifactory_url'] = '/'.join([self.credentials['artifactory_url'], 'api'])
-        self.artifactory.artifactory_url = self.credentials['artifactory_url']
+        if not self.base_url.endswith('/api'):
+            self.api_url = '/'.join([self.base_url, 'api'])
+        else:
+            self.api_url = base_url
+        self.artifactory.artifactory_url = self.api_url
         self.artifactory.username = self.credentials['artifactory_username']
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
         self.artifactory.certbundle = certifi.where()
@@ -95,6 +98,7 @@ class Artifactory(object):
 
         for artifact in artifacts:
             artifact_path = "{}/{}".format(artifact['path'], artifact['name'])
+            self.artifactory.get_properties("https://artifactory.build.gogoair.com/artifactory/yum-local-fast/"+artifact_path)
             LOG.info("  {} purge {}:{}".format(mode, self.repo_name, artifact_path))
             if dry_run:
                 purged += 1
