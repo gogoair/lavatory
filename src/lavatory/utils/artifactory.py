@@ -159,12 +159,13 @@ class Artifactory(object):
         artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
         return sorted(artifacts, key=lambda k: k['path'])
 
-    def time_based_retention(self, keep_days=None, item_type='file'):
+    def time_based_retention(self, keep_days=None, item_type='file', search_properties=None):
         """Retains artifacts based on number of days since creation.
 
         Args:
             keep_days (int): Number of days to keep an artifact.
             item_type (str): The item type to search for (file/folder/any). 
+            search_properties (dict): dictionary of key/value pairs to search for in properties.
         
         Return:
             list: List of artifacts matching retention policy
@@ -172,7 +173,12 @@ class Artifactory(object):
         now = datetime.datetime.now()
         before = now - datetime.timedelta(days=keep_days)
         created_before = before.strftime("%Y-%m-%dT%H:%M:%SZ")
-        purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=[{"created": {"$lt": created_before}}])
+        extra_terms = [{"created": {"$lt": created_before}}] 
+        if search_properties:
+            for key, value in search_properties.items():
+                search_aql = {'@'+key: {"$match": value} }
+                extra_terms.append(search_aql)
+        purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=extra_terms)
         return sorted(purgable_artifacts, key=lambda k: k['path'])
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
