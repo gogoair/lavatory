@@ -17,7 +17,7 @@ class Artifactory(object):
     def __init__(self, repo_name=None):
         self.repo_name = repo_name
         self.credentials = load_credentials()
-        self.base_url = credentials['artifactory_url']
+        self.base_url = self.credentials['artifactory_url']
         self.artifactory = party.Party()
         if not self.base_url.endswith('/api'):
             self.api_url = '/'.join([self.base_url, 'api'])
@@ -60,28 +60,6 @@ class Artifactory(object):
             repos[repo["repoKey"]] = repo
 
         return repos
-
-    def all_artifacts(self, search='', depth=3):
-        """ Returns a dict of artifact and properties.
-
-        Args:
-            search (str): Search regex.
-            depth (int): Depth.
-
-        Returns:
-            all_artifacts (dict): All artifacts.
-        """
-        LOG.debug('Finding all artifacts with: search=%s, repo=%s, depth=%s', search, self.repo_name, depth)
-
-        all_artifacts = self.artifactory.find_by_pattern(filename=search, specific_repo=self.repo_name, max_depth=depth)
-
-        for artifact in sorted(all_artifacts):
-            artifact_simple_name = self._parse_artifact_name(artifact)
-            LOG.debug('Found: %s', artifact_simple_name)
-            self.artifactory.get_properties(artifact)
-
-        LOG.info('Found %d artifacts in total.', len(all_artifacts))
-        return all_artifacts
 
     def purge(self, dry_run, artifacts):
         """ Purge artifacts from the specified repo.
@@ -181,18 +159,36 @@ class Artifactory(object):
 
         return purgable_artifacts
 
-    def get_all_repo_artifacts(self, depth=None, item_type='file'):
+    def get_artifact_properties(self, artifact):
+        """Given an artifact, queries for properties from artifact URL
+
+        Args:
+            artifact (dict): Dictionary of artifact info. Needs artifact['name'] and ['path'].
+
+        Returns:
+            dict: Dictionary of all properties on specific artifact
+        """
+        artifact_url = "{0}/{1}/{2}/{3}".format(self.base_url, self.repo_name, artifact['path'], artifact['name'])
+        LOG.debug("Getting properties for %s", artifact_url)
+        self.artifactory.get_properties(artifact_url)
+        return self.artifactory.properties
+
+    def get_all_repo_artifacts(self, depth=None, item_type='file', with_properties=True):
         """returns all artifacts in a repo with metadata
         
         Args:
             depth (int): How far down Artifactory folder to look. None will go to bottom of folder.
-            item_type (str): The item type to search for (file/folder/any)
+            item_type (str): The item type to search for (file/folder/any).abs
         
         Returns:
             list: Sorted list of all artifacts in a repository
         """
         LOG.info("Searching for all artifacts in %s.", self.repo_name)
         artifacts = self.filter(item_type=item_type, depth=depth)
+        if with_properties:
+            for i, artifact in enumerate(artifacts):
+                properties = self.get_artifact_properties(artifact)
+                artifacts[i]['properties'] = properties
         return sorted(artifacts, key=lambda k: k['path'])
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
