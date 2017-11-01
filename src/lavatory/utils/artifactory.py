@@ -88,7 +88,7 @@ class Artifactory(object):
 
         return purged
 
-    def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0, item_type="folder"):
+    def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0, fields=[], item_type="folder"):
         """Get a subset of artifacts from the specified repo.
         This looks at the project level, but actually need to iterate lower at project level
 
@@ -120,7 +120,7 @@ class Artifactory(object):
 
         LOG.debug("AQL: {}".format(aql))
         response = self.artifactory.find_by_aql(
-            criteria=aql, order_and_fields=sort, offset_records=offset, num_records=limit)
+            fields=fields, criteria=aql, order_and_fields=sort, offset_records=offset, num_records=limit)
 
         results = response['results']
 
@@ -178,16 +178,17 @@ class Artifactory(object):
         Args:
             depth (int): How far down Artifactory folder to look. None will go to bottom of folder.
             item_type (str): The item type to search for (file/folder/any).
+            with_properties (bool): Include artifact properties or not.
         
         Returns:
             list: Sorted list of all artifacts in a repository
         """
         LOG.info("Searching for all artifacts in %s.", self.repo_name)
-        artifacts = self.filter(item_type=item_type, depth=depth)
         if with_properties:
-            for i, artifact in enumerate(artifacts):
-                properties = self.get_artifact_properties(artifact)
-                artifacts[i]['properties'] = properties
+            fields = ['stat', 'property.*']
+        else:
+            fields = []
+        artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
         return sorted(artifacts, key=lambda k: k['path'])
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):

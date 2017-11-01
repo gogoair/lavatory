@@ -41,12 +41,10 @@ def test_get_all_artifacts(mock_properties, mock_find_aql, artifactory):
 
     expected_return = [{
         'name': 'test1',
-        'path': '/path/to/test/1',
-        'properties': TEST_PROPS
+        'path': '/path/to/test/1'
     }, {
         'name': 'test2',
-        'path': '/path/to/test/2',
-        'properties': TEST_PROPS
+        'path': '/path/to/test/2'
     }]
     artifacts = artifactory.get_all_repo_artifacts()
     assert artifacts == expected_return
