@@ -15,13 +15,20 @@ LOG = logging.getLogger(__name__)
 @click.option(
     '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
 @click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
-def purge(ctx, dryrun, policies_path, default):
+@click.option('--repo', default=None, multiple=True, required=False, 
+              help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
+def purge(ctx, dryrun, policies_path, default, repo):
     """Deletes artifacts based on retention policies"""
     artifactory = Artifactory(repo_name=None)
-
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
-    before = artifactory.list()
-    for repo, info in before.items():
+
+    if repo:
+        all_repos = repo
+    else:
+        all_repos = artifactory.list()
+        return
+
+    for repo in all_repos:
         policy_name = repo.replace("-", "_")
         artifactory_repo = Artifactory(repo_name=repo)
         try:
