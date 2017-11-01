@@ -47,14 +47,13 @@ def test_count_based_retention(mock_find_aql, artifactory):
     purgable = artifactory.count_based_retention(retention_count=1)
     assert purgable == expected_return
 
+
 @mock.patch('lavatory.utils.artifactory.party.Party.find_by_aql')
 def test_time_based_retention(mock_find_aql, artifactory):
     """Tests count base retention returns sorted values"""
     test_artifacts = {'results': [TEST_ARTIFACT2, TEST_ARTIFACT1]}
     mock_find_aql.return_value = test_artifacts
 
-    # deplicates values because of nested search at project level. Expected
-    expected_return = [TEST_ARTIFACT1, TEST_ARTIFACT1, TEST_ARTIFACT2, TEST_ARTIFACT2]
-    purgable = artifactory.count_time_retention(keep_days=10)
+    expected_return = [TEST_ARTIFACT1, TEST_ARTIFACT2]
+    purgable = artifactory.time_based_retention(keep_days=10)
     assert purgable == expected_return
-
