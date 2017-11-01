@@ -76,7 +76,6 @@ class Artifactory(object):
 
         for artifact in artifacts:
             artifact_path = "{}/{}".format(artifact['path'], artifact['name'])
-            self.artifactory.get_properties("https://artifactory.build.gogoair.com/artifactory/yum-local-fast/"+artifact_path)
             LOG.info("  {} purge {}:{}".format(mode, self.repo_name, artifact_path))
             if dry_run:
                 purged += 1
@@ -178,7 +177,7 @@ class Artifactory(object):
         
         Args:
             depth (int): How far down Artifactory folder to look. None will go to bottom of folder.
-            item_type (str): The item type to search for (file/folder/any).abs
+            item_type (str): The item type to search for (file/folder/any).
         
         Returns:
             list: Sorted list of all artifacts in a repository
