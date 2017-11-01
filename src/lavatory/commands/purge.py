@@ -22,12 +22,13 @@ def purge(ctx, dryrun, policies_path, default, repo):
     artifactory = Artifactory(repo_name=None)
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
 
+    before_repo_data = artifactory.list()
     if repo:
         all_repos = repo
     else:
-        all_repos = artifactory.list()
-        return
-
+        all_repos = before_repo_data.keys()
+    
+    LOG.info("Applying retention policies to %s", ', '.join(all_repos))
     for repo in all_repos:
         policy_name = repo.replace("-", "_")
         artifactory_repo = Artifactory(repo_name=repo)
@@ -48,11 +49,12 @@ def purge(ctx, dryrun, policies_path, default, repo):
 
     LOG.info("")
     LOG.info("Purging Performance:")
-    after = artifactory.list()
-    for repo, info in after.items():
-        try:
-            get_performance_report(repo, before[repo], info)
-        except IndexError:
-            pass
+    after_repo_data = artifactory.list()
+    for repo, info in after_repo_data.items():
+        if repo in all_repos:
+            try:
+                get_performance_report(repo, before_repo_data[repo], info)
+            except IndexError:
+                pass
 
     LOG.info("Done.")
