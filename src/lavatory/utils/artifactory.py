@@ -22,7 +22,7 @@ class Artifactory(object):
         if not self.base_url.endswith('/api'):
             self.api_url = '/'.join([self.base_url, 'api'])
         else:
-            self.api_url = base_url
+            self.api_url = self.base_url
         self.artifactory.artifactory_url = self.api_url
         self.artifactory.username = self.credentials['artifactory_username']
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
