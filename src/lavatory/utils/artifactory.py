@@ -126,38 +126,6 @@ class Artifactory(object):
 
         return results
 
-    def retain(self, spec_project, depth=3, terms=None, weeks=None):
-        """Returns purgable artifacts.
-
-        Args:
-            spec_project: Spec_project
-            depth (int): Depth level.
-            terms: Terms for filter.
-            weeks: Number of weeks.
-
-        Returns:
-            purgable (list): Purgable.
-        """
-        if [terms, weeks].count(None) != 1:
-            raise ValueError("Must specify exactly one of terms, count, or weeks")
-
-        purgable_artifacts = []
-        for project in self.filter(depth=depth):
-            if spec_project and spec_project != project["name"]:
-                continue
-
-            path = "{}/{}".format(project["path"], project["name"])
-            if weeks:
-                now = datetime.datetime.now()
-                before = now - datetime.timedelta(weeks=weeks)
-                created = before.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-                purgable_artifacts.extend(self.filter(depth=depth + 1, terms=[{"path": path}, {"created": created}]))
-            if terms:
-                pass
-
-        return purgable_artifacts
-
     def get_artifact_properties(self, artifact):
         """Given an artifact, queries for properties from artifact URL
 
@@ -190,6 +158,22 @@ class Artifactory(object):
             fields = []
         artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
         return sorted(artifacts, key=lambda k: k['path'])
+
+    def time_based_retention(self, keep_days=None, item_type='file'):
+        """Retains artifacts based on number of days since creation.
+
+        Args:
+            keep_days (int): Number of days to keep an artifact.
+            item_type (str): The item type to search for (file/folder/any). 
+        
+        Return:
+            list: List of artifacts matching retention policy
+        """
+        now = datetime.datetime.now()
+        before = now - datetime.timedelta(days=keep_days)
+        created_before = before.strftime("%Y-%m-%dT%H:%M:%SZ")
+        purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=[{"created": {"$lt": created_before}}])
+        return sorted(purgable_artifacts, key=lambda k: k['path'])
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
         """Return all artifacts except the <count> most recent.
