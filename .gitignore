@@ -107,3 +107,6 @@ venv.bak/
 # Pycharm
 .idea/
 # End of https://www.gitignore.io/api/python
+
+#Lavatory Specific
+docs/lavatory/

@@ -8,9 +8,16 @@
 Welcome to lavatory's documentation!
 ====================================
 
+Contents
+--------
+
 .. toctree::
    :maxdepth: 2
    :titlesonly:
+
+   policies/index
+   RELEASING
+   lavatory/modules
    CHANGELOG
 
 .. include:: ../README.rst
