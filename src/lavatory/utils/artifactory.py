@@ -96,7 +96,7 @@ class Artifactory(object):
         will be called on a repo sufficiently frequently that removing just
         the default n items will be enough.
 
-        Args
+        Args:
             terms (list): an array of jql snippets that will be ANDed together
             depth (int): how far down the folder hierarchy to look
             sort (dict): How to sort Artifactory results
@@ -111,6 +111,7 @@ class Artifactory(object):
         if terms is None:
             terms = []
 
+        terms.append({"path": {"$nmatch": "*/repodata"}})  # ignore all repodata. In future make configurable
         terms.append({"repo": {"$eq": self.repo_name}})
         terms.append({"type": {"$eq": item_type}})
         if depth:
@@ -159,13 +160,18 @@ class Artifactory(object):
         artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
         return sorted(artifacts, key=lambda k: k['path'])
 
-    def time_based_retention(self, keep_days=None, item_type='file', search_properties=None):
+    def time_based_retention(self, keep_days=None, item_type='file', extra_aql=[]):
         """Retains artifacts based on number of days since creation.
+
+            extra_aql example: [{"@deployed": {"$match": "dev"}}, {"@deployed": {"$nmatch": "prod"}}]
+            This would search for artifacts that were created after <keep_days> with
+            property "deployed" equal to dev and not equal to prod.
 
         Args:
             keep_days (int): Number of days to keep an artifact.
             item_type (str): The item type to search for (file/folder/any). 
-            search_properties (dict): dictionary of key/value pairs to search for in properties.
+            extra_aql (list). List of extra AQL terms to apply to search
+
         
         Return:
             list: List of artifacts matching retention policy
@@ -173,12 +179,9 @@ class Artifactory(object):
         now = datetime.datetime.now()
         before = now - datetime.timedelta(days=keep_days)
         created_before = before.strftime("%Y-%m-%dT%H:%M:%SZ")
-        extra_terms = [{"created": {"$lt": created_before}}] 
-        if search_properties:
-            for key, value in search_properties.items():
-                search_aql = {'@'+key: {"$match": value} }
-                extra_terms.append(search_aql)
-        purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=extra_terms)
+        aql_terms = [{"created": {"$lt": created_before}}]
+        aql_terms.extend(extra_aql)
+        purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=aql_terms)
         return sorted(purgable_artifacts, key=lambda k: k['path'])
 
     def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
