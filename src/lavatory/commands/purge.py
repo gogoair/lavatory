@@ -52,7 +52,7 @@ def apply_purge_policies(all_repos, policies_path=None, dryrun=True, default=Tru
         artifactory_repo = Artifactory(repo_name=repo)
         try:
             policy = plugin_source.load_plugin(policy_name)
-        except ModuleNotFoundError:
+        except ImportError:
             if default:
                 LOG.info("No policy found for %s. Applying Default", repo)
                 policy = plugin_source.load_plugin('default')
