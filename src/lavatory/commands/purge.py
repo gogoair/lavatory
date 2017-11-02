@@ -30,18 +30,19 @@ def purge(ctx, dryrun, policies_path, default, repo):
     else:
         all_repos = before_purge_data.keys()
 
-    apply_purge_policies(all_repos, dryrun=dryrun)
+    apply_purge_policies(all_repos, dryrun=dryrun, default=default)
     generate_purge_report(all_repos, before_purge_data)
 
     LOG.info("Success.")
 
 
-def apply_repo_policy(all_repos, dryrun=True):
+def apply_repo_policy(all_repos, dryrun=True, default=True):
     """Sets up the plugins to find purgable artifacts and delete them. 
 
     Args:
         all_repos (list): List of repos to run against.
         dryrun (bool): If true, will not actually delete artifacts.
+        default (bool): If true, applies default policy to repos with no specific policy.
     """
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     LOG.info("Applying retention policies to %s", ', '.join(all_repos))
