@@ -1,3 +1,4 @@
+import inspect
 import logging
 
 import click
@@ -59,6 +60,7 @@ def apply_purge_policies(all_repos, policies_path=None, dryrun=True, default=Tru
             else:
                 LOG.info("No policy found for %s. Skipping Default", repo)
                 continue
+        LOG.info("Policy Docs: %s", inspect.getdoc(policy.purgelist))
         artifacts = policy.purgelist(artifactory_repo)
         purged_count = artifactory_repo.purge(dryrun, artifacts)
         LOG.info("Processed {}, Purged {}".format(repo, purged_count))
