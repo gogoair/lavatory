@@ -7,16 +7,14 @@ Lavatory
 Tooling to define repository specific retention policies in Artifactory.
 Allows highly customizable retention policies via Python plugins.
 
-This tool is an Work in Progres! Not ready for production use!
-
 Requirements
-~~~~~~~~~~~~
+------------
 
 -  Python 3.4+
 -  Artifactory user with API permissions
 
 Authentication
-~~~~~~~~~~~~~~
+--------------
 
 This tool looks for 3 enviroment variables in order to authenticate:
 
@@ -30,7 +28,7 @@ These will be loaded in at the beginning of a run and raise an exception
 if missing.
 
 Installing
-~~~~~~~~~~
+----------
 
 From pypi:
 
@@ -45,7 +43,7 @@ Or install directly from the code:
     pip install -U .
 
 Running
-~~~~~~~
+-------
 
 ::
 
@@ -63,7 +61,7 @@ Running
       version  Print version information.
 
 Purging Artifacts
------------------
+~~~~~~~~~~~~~~~~~
 
 ``lavatory purge --policies-path=/path/to/policies``
 
@@ -89,7 +87,7 @@ You can specify ``--repo`` as multiple times to run against multiple repos. If `
 provided, Lavatory will run against all repos in Artifactory.  
 
 Testing
-~~~~~~~
+-------
 
 ::
 

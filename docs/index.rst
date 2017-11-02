@@ -12,9 +12,10 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
    :titlesonly:
 
+   getting_started
    policies/index
    RELEASING
    lavatory/modules
