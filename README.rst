@@ -99,3 +99,4 @@ Testing
 
 .. |Doc Status| image:: https://readthedocs.org/projects/lavatory/badge/?version=latest
    :target: http://lavatory.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status   
