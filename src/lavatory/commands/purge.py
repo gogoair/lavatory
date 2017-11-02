@@ -24,23 +24,24 @@ LOG = logging.getLogger(__name__)
 def purge(ctx, dryrun, policies_path, default, repo):
     """Deletes artifacts based on retention policies"""
     artifactory = Artifactory(repo_name=None)
-    before_repo_data = artifactory.list()
+    before_purge_data = artifactory.list()
     if repo:
         all_repos = repo
     else:
         all_repos = before_purge_data.keys()
 
-    apply_purge_policies(all_repos, dryrun=dryrun, default=default)
+    apply_purge_policies(all_repos, policies_path=policies_path, dryrun=dryrun, default=default)
     generate_purge_report(all_repos, before_purge_data)
 
     LOG.info("Success.")
 
 
-def apply_repo_policy(all_repos, dryrun=True, default=True):
+def apply_purge_policies(all_repos, policies_path=None, dryrun=True, default=True):
     """Sets up the plugins to find purgable artifacts and delete them. 
 
     Args:
         all_repos (list): List of repos to run against.
+        policies_path (str): Path to extra policies
         dryrun (bool): If true, will not actually delete artifacts.
         default (bool): If true, applies default policy to repos with no specific policy.
     """
