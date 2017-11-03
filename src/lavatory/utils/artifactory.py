@@ -88,7 +88,7 @@ class Artifactory(object):
 
         return purged
 
-    def filter(self, terms=None, depth=3, sort={}, offset=0, limit=0, fields=[], item_type="folder"):
+    def filter(self, terms=None, depth=3, sort=None, offset=0, limit=0, fields=None, item_type="folder"):
         """Get a subset of artifacts from the specified repo.
         This looks at the project level, but actually need to iterate lower at project level
 
@@ -98,7 +98,8 @@ class Artifactory(object):
 
         Args:
             terms (list): an array of jql snippets that will be ANDed together
-            depth (int): how far down the folder hierarchy to look
+            depth (int, optional): how far down the folder hierarchy to look
+            fields (list): Fields
             sort (dict): How to sort Artifactory results
             offset (int): how many items from the beginning of the list should be skipped (optional)
             limit (int): the maximum number of entries to return (optional)
@@ -108,6 +109,10 @@ class Artifactory(object):
             list: List of artifacts returned from query
         """
 
+        if sort is None:
+            sort = {}
+        if fields is None:
+            fields = []
         if terms is None:
             terms = []
 
@@ -160,7 +165,7 @@ class Artifactory(object):
         artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
         return sorted(artifacts, key=lambda k: k['path'])
 
-    def time_based_retention(self, keep_days=None, item_type='file', extra_aql=[]):
+    def time_based_retention(self, keep_days=None, item_type='file', extra_aql=None):
         """Retains artifacts based on number of days since creation.
 
             extra_aql example: [{"@deployed": {"$match": "dev"}}, {"@deployed": {"$nmatch": "prod"}}]
@@ -171,11 +176,13 @@ class Artifactory(object):
             keep_days (int): Number of days to keep an artifact.
             item_type (str): The item type to search for (file/folder/any). 
             extra_aql (list). List of extra AQL terms to apply to search
-
         
         Return:
             list: List of artifacts matching retention policy
         """
+        if extra_aql is None:
+            extra_aql = []
+
         now = datetime.datetime.now()
         before = now - datetime.timedelta(days=keep_days)
         created_before = before.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -209,8 +216,6 @@ class Artifactory(object):
                     terms=[{
                         "path": path
                     }],
-                    sort={
-                        "$desc": ["created"]
-                    }))
+                    sort={"$desc": ["created"]}))
 
         return sorted(purgable_artifacts, key=lambda k: k['path'])
