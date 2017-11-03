@@ -27,28 +27,29 @@ def purge(ctx, dryrun, policies_path, default, repo):
     artifactory = Artifactory(repo_name=None)
     before_purge_data = artifactory.list()
     if repo:
-        all_repos = repo
+        selected_repos = repo
     else:
-        all_repos = before_purge_data.keys()
+        selected_repos = before_purge_data.keys()
 
-    apply_purge_policies(all_repos, policies_path=policies_path, dryrun=dryrun, default=default)
-    generate_purge_report(all_repos, before_purge_data)
+    apply_purge_policies(selected_repos, policies_path=policies_path, dryrun=dryrun, default=default)
+    generate_purge_report(selected_repos, before_purge_data)
 
     LOG.info("Success.")
+    return True
 
 
-def apply_purge_policies(all_repos, policies_path=None, dryrun=True, default=True):
+def apply_purge_policies(selected_repos, policies_path=None, dryrun=True, default=True):
     """Sets up the plugins to find purgable artifacts and delete them. 
 
     Args:
-        all_repos (list): List of repos to run against.
+        selected_repos (list): List of repos to run against.
         policies_path (str): Path to extra policies
         dryrun (bool): If true, will not actually delete artifacts.
         default (bool): If true, applies default policy to repos with no specific policy.
     """
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
-    LOG.info("Applying retention policies to %s", ', '.join(all_repos))
-    for repo in all_repos:
+    LOG.info("Applying retention policies to %s", ', '.join(selected_repos))
+    for repo in selected_repos:
         policy_name = repo.replace("-", "_")
         artifactory_repo = Artifactory(repo_name=repo)
         try:
@@ -73,7 +74,7 @@ def generate_purge_report(purged_repos, before_purge_data):
         purged_repos (list): List of repos that had policy applied.
         before_purge_data (dict): Data on the state of Artifactory before purged artifacts
     """
-    LOG.info("\nPurging Performance:")
+    LOG.info("Purging Performance:")
     artifactory = Artifactory(repo_name=None)
     after_purge_data = artifactory.list()
     for repo, info in after_purge_data.items():
