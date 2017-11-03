@@ -5,6 +5,7 @@ import logging
 
 import certifi
 import party
+import requests
 
 from ..credentials import load_credentials
 
@@ -27,19 +28,6 @@ class Artifactory(object):
         self.artifactory.username = self.credentials['artifactory_username']
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
         self.artifactory.certbundle = certifi.where()
-
-    @staticmethod
-    def _parse_artifact_name(name):
-        """Artifact name parser.
-
-        Args:
-            name (str): Long name.
-
-        Returns:
-            simple_name (str): Simple name.
-        """
-        simple_name = '/'.join(name.split('/')[-4:])
-        return simple_name
 
     def list(self):
         """
@@ -76,18 +64,19 @@ class Artifactory(object):
 
         for artifact in artifacts:
             artifact_path = "{}/{}".format(artifact['path'], artifact['name'])
-            LOG.info("  {} purge {}:{}".format(mode, self.repo_name, artifact_path))
+            LOG.info("  %s purge %s:%s", mode, self.repo_name, artifact_path)
             if dry_run:
                 purged += 1
             else:
                 try:
                     self.artifactory.delete(artifact_path)
                     purged += 1
-                except Exception as error:
+                except requests.exceptions.BaseHTTPError as error:
                     LOG.error(str(error))
 
         return purged
 
+    # pylint: disable-msg=too-many-arguments
     def filter(self, terms=None, depth=3, sort=None, offset=0, limit=0, fields=None, item_type="folder"):
         """Get a subset of artifacts from the specified repo.
         This looks at the project level, but actually need to iterate lower at project level
@@ -124,7 +113,7 @@ class Artifactory(object):
 
         aql = {"$and": terms}
 
-        LOG.debug("AQL: {}".format(aql))
+        LOG.debug("AQL: %s", aql)
         response = self.artifactory.find_by_aql(
             fields=fields, criteria=aql, order_and_fields=sort, offset_records=offset, num_records=limit)
 
@@ -144,18 +133,18 @@ class Artifactory(object):
         artifact_url = "{0}/{1}/{2}/{3}".format(self.base_url, self.repo_name, artifact['path'], artifact['name'])
         LOG.debug("Getting properties for %s", artifact_url)
         self.artifactory.get_properties(artifact_url)
-        return self.artifactory.properties
+        return self.artifactory.properties  # pylint: disable=no-member
 
     def get_all_repo_artifacts(self, depth=None, item_type='file', with_properties=True):
         """returns all artifacts in a repo with metadata
-        
+
         Args:
             depth (int): How far down Artifactory folder to look. None will go to bottom of folder.
             item_type (str): The item type to search for (file/folder/any).
             with_properties (bool): Include artifact properties or not.
-        
+
         Returns:
-            list: Sorted list of all artifacts in a repository
+            list: Sorted list of all artifacts in a repository.
         """
         LOG.info("Searching for all artifacts in %s.", self.repo_name)
         if with_properties:
@@ -174,9 +163,9 @@ class Artifactory(object):
 
         Args:
             keep_days (int): Number of days to keep an artifact.
-            item_type (str): The item type to search for (file/folder/any). 
+            item_type (str): The item type to search for (file/folder/any).
             extra_aql (list). List of extra AQL terms to apply to search
-        
+
         Return:
             list: List of artifacts matching retention policy
         """

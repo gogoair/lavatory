@@ -1,3 +1,4 @@
+"""Performance comparison"""
 import logging
 
 from humanfriendly import format_number, format_size, parse_size

@@ -1,3 +1,4 @@
+"""Purges artifacts."""
 import inspect
 import logging
 
@@ -24,6 +25,7 @@ LOG = logging.getLogger(__name__)
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
 def purge(ctx, dryrun, policies_path, default, repo):
     """Deletes artifacts based on retention policies"""
+    LOG.debug('Passed args: %s, %s, %s, %s, %s,', ctx, dryrun, policies_path, default, repo)
     artifactory = Artifactory(repo_name=None)
     before_purge_data = artifactory.list()
     if repo:
@@ -64,7 +66,7 @@ def apply_purge_policies(selected_repos, policies_path=None, dryrun=True, defaul
         LOG.info("Policy Docs: %s", inspect.getdoc(policy.purgelist))
         artifacts = policy.purgelist(artifactory_repo)
         purged_count = artifactory_repo.purge(dryrun, artifacts)
-        LOG.info("Processed {}, Purged {}".format(repo, purged_count))
+        LOG.info("Processed %s, Purged %s", repo, purged_count)
 
 
 def generate_purge_report(purged_repos, before_purge_data):

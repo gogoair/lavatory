@@ -1,3 +1,4 @@
+"""Main entry point."""
 import logging
 import pprint
 
@@ -15,8 +16,9 @@ LOG = logging.getLogger(__name__)
 @click.pass_context
 def root(ctx, verbose):
     """Lavatory is a tool for managing Artifactory Retention Policies."""
+    LOG.debug('Passed args: %s, %s', ctx, verbose)
     coloredlogs.install(level=0, fmt='[%(levelname)s] %(name)s %(message)s', isatty=True)
-    logging.root.setLevel(logging.INFO)  # coloredlogs likes to change root level
+    logging.root.setLevel(logging.INFO)  # colored logs likes to change root level
     verbosity = logging.root.getEffectiveLevel() - 10 * verbose or 1
     logging.getLogger(__package__).setLevel(verbosity)
 
