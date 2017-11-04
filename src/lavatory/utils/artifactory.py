@@ -49,6 +49,27 @@ class Artifactory(object):
 
         return repos
 
+    def get_statistics(self):
+        """Get statistics of a repo.
+            Examples: lavatory stats --repo docker-local
+
+        Returns:
+            str.
+        """
+        storage = self.list()
+        try:
+            repo = storage[self.repo_name]
+            LOG.info('Repo Name: %s.', repo.get('repoKey'))
+            LOG.info('Repo Type: %s - %s.', repo.get('repoType'), repo.get('packageType'))
+            LOG.info('Repo Used Space: %s - %s of total used space.', repo.get('usedSpace'), repo.get('percentage'))
+            LOG.info('Repo Folders %s, Files %s. Total items count: %s.',
+                     repo.get('foldersCount'), repo.get('filesCount'), repo.get('itemsCount'))
+        except KeyError as error:
+            LOG.error('Repo %s does not exist.', self.repo_name)
+            return error
+
+        return 'OK.'
+
     def purge(self, dry_run, artifacts):
         """ Purge artifacts from the specified repo.
 

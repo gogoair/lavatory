@@ -7,6 +7,7 @@ import coloredlogs
 import pip
 
 from .commands.purge import purge
+from .commands.stats import stats
 
 LOG = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ def version():
 
 
 root.add_command(purge)
+root.add_command(stats)
 
 if __name__ == '__main__':
     root()
