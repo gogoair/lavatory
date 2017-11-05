@@ -101,6 +101,7 @@ Getting Statistics
 ``lavatory stats --repo test-local``
 
 ::
+
     $ lavatory stats --help
     Usage: lavatory stats [OPTIONS]
 
