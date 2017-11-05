@@ -1,3 +1,4 @@
+"""Test statistics function."""
 import pytest
 from unittest import mock
 
@@ -36,5 +37,5 @@ def test_stats(mock_party_request, artifactory):
     mock_party_request.return_value.json.return_value = data
     art = artifactory.get_statistics()
 
-    assert art == 'OK.'
-    assert isinstance(art, str)
+    assert art is True
+    assert isinstance(art, bool)

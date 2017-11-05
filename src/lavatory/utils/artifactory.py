@@ -42,10 +42,10 @@ class Artifactory(object):
         data = raw_data.json()
         LOG.debug('Storage info data: %s', data)
         for repo in data["repositoriesSummaryList"]:
-            if repo["repoKey"] == "TOTAL":
+            if repo['repoKey'] == "TOTAL":
                 continue
 
-            repos[repo["repoKey"]] = repo
+            repos[repo['repoKey']] = repo
 
         return repos
 
@@ -57,18 +57,25 @@ class Artifactory(object):
             str.
         """
         storage = self.list()
-        try:
-            repo = storage[self.repo_name]
+        if self.repo_name:
+            if not storage.get(self.repo_name):
+                LOG.error('Repo %s does not exist!', self.repo_name)
+                return False
+            keys = [self.repo_name]
+        else:
+            keys = storage.keys()
+
+        for repository in keys:
+            repo = storage.get(repository)
+            LOG.info('*' * 25)
             LOG.info('Repo Name: %s.', repo.get('repoKey'))
             LOG.info('Repo Type: %s - %s.', repo.get('repoType'), repo.get('packageType'))
             LOG.info('Repo Used Space: %s - %s of total used space.', repo.get('usedSpace'), repo.get('percentage'))
             LOG.info('Repo Folders %s, Files %s. Total items count: %s.',
                      repo.get('foldersCount'), repo.get('filesCount'), repo.get('itemsCount'))
-        except KeyError as error:
-            LOG.error('Repo %s does not exist.', self.repo_name)
-            return error
+            LOG.info('*' * 25)
 
-        return 'OK.'
+        return True
 
     def purge(self, dry_run, artifacts):
         """ Purge artifacts from the specified repo.
