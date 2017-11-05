@@ -5,7 +5,7 @@ import logging
 
 import certifi
 import party
-import requests
+from requests.exceptions import (BaseHTTPError, ConnectionError, HTTPError, InvalidURL, RequestException)
 
 from ..credentials import load_credentials
 
@@ -88,18 +88,19 @@ class Artifactory(object):
             purged (int): Count purged.
         """
         purged = 0
-        mode = "DRYRUN" if dry_run else "LIVE"
+        mode = 'DRYRUN' if dry_run else 'LIVE'
+        LOG.info('Running mode: %s', mode)
 
         for artifact in artifacts:
-            artifact_path = "{}/{}".format(artifact['path'], artifact['name'])
-            LOG.info("  %s purge %s:%s", mode, self.repo_name, artifact_path)
+            artifact_path = '{}/{}'.format(artifact['path'], artifact['name'])
+            LOG.info('%s purge %s:%s', mode, self.repo_name, artifact_path)
             if dry_run:
                 purged += 1
             else:
                 try:
                     self.artifactory.delete(artifact_path)
                     purged += 1
-                except requests.exceptions.BaseHTTPError as error:
+                except (BaseHTTPError, HTTPError, InvalidURL, RequestException, ConnectionError) as error:
                     LOG.error(str(error))
 
         return purged
