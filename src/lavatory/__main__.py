@@ -13,7 +13,7 @@ LOG = logging.getLogger(__name__)
 
 
 @click.group()
-@click.option('-v', '--verbose', count=True, help='Increases logging level')
+@click.option('-v', '--verbose', count=True, help='Increases logging level.')
 @click.pass_context
 def root(ctx, verbose):
     """Lavatory is a tool for managing Artifactory Retention Policies."""

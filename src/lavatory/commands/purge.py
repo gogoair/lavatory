@@ -13,10 +13,10 @@ LOG = logging.getLogger(__name__)
 
 @click.command()
 @click.pass_context
-@click.option('--policies-path', required=False, help='Path to extra policies directory')
+@click.option('--policies-path', required=False, help='Path to extra policies directory.')
 @click.option(
-    '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default')
-@click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy')
+    '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default.')
+@click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy.')
 @click.option(
     '--repo',
     default=None,
@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
     required=False,
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
 def purge(ctx, dryrun, policies_path, default, repo):
-    """Deletes artifacts based on retention policies"""
+    """Deletes artifacts based on retention policies."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s,', ctx, dryrun, policies_path, default, repo)
     artifactory = Artifactory(repo_name=None)
     before_purge_data = artifactory.list()

@@ -52,14 +52,15 @@ Running
     $ lavatory --help
     Usage: lavatory [OPTIONS] COMMAND [ARGS]...
 
-      Lavatory is a tool for managing Artifactory Retention Policies
+      Lavatory is a tool for managing Artifactory Retention Policies.
 
     Options:
-      -v, --verbose  Increases logging level
+      -v, --verbose  Increases logging level.
       --help         Show this message and exit.
 
     Commands:
-      purge  Deletes artifacts based on retention policies
+      purge  Deletes artifacts based on retention policies.
+      stats    Get statistics of a repo.
       version  Print version information.
 
 Purging Artifacts
@@ -94,6 +95,21 @@ Policies
 See the `Creating Retention Policies`_ docs for more details on how
 to create and use retention policies with Lavatory.
 
+
+Getting Statistics
+~~~~~~~~~~~~~~~~~
+``lavatory stats --repo test-local``
+
+::
+    $ lavatory stats --help
+    Usage: lavatory stats [OPTIONS]
+
+      Get statistics of a repo.
+
+    Options:
+      --repo TEXT  Name of specific repository to run against. If not provided,
+                   uses all repos.
+      --help       Show this message and exit.
 
 Testing
 -------
