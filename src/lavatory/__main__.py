@@ -6,6 +6,7 @@ import click
 import coloredlogs
 import pip
 
+from .commands.policies import policies
 from .commands.purge import purge
 from .commands.stats import stats
 
@@ -44,6 +45,7 @@ def version():
         raise KeyError('Could not find {0}'.format(__package__))
 
 
+root.add_command(policies)
 root.add_command(purge)
 root.add_command(stats)
 

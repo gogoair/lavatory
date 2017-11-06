@@ -51,22 +51,22 @@ def apply_purge_policies(selected_repos, policies_path=None, dryrun=True, defaul
     """
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     LOG.info("Applying retention policies to %s", ', '.join(selected_repos))
-    for repo in selected_repos:
-        policy_name = repo.replace("-", "_")
-        artifactory_repo = Artifactory(repo_name=repo)
+    for repository in selected_repos:
+        policy_name = repository.replace("-", "_")
+        artifactory_repo = Artifactory(repo_name=repository)
         try:
             policy = plugin_source.load_plugin(policy_name)
         except ImportError:
             if default:
-                LOG.info("No policy found for %s. Applying Default", repo)
+                LOG.info("No policy found for %s. Applying Default", repository)
                 policy = plugin_source.load_plugin('default')
             else:
-                LOG.info("No policy found for %s. Skipping Default", repo)
+                LOG.info("No policy found for %s. Skipping Default", repository)
                 continue
         LOG.info("Policy Docs: %s", inspect.getdoc(policy.purgelist))
         artifacts = policy.purgelist(artifactory_repo)
         purged_count = artifactory_repo.purge(dryrun, artifacts)
-        LOG.info("Processed %s, Purged %s", repo, purged_count)
+        LOG.info("Processed %s, Purged %s", repository, purged_count)
 
 
 def generate_purge_report(purged_repos, before_purge_data):
