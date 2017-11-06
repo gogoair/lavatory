@@ -19,7 +19,7 @@ LOG = logging.getLogger(__name__)
 def stats(ctx, repo):
     """Get statistics of repos."""
     LOG.debug('Passed args: %s, %s.', ctx, repo)
-    artifactory = Artifactory(repo_name=repo)
+    artifactory = Artifactory(repo_name=None)
     storage = artifactory.list()
 
     if not repo:
