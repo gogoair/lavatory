@@ -108,8 +108,9 @@ Getting Statistics
       Get statistics of a repo.
 
     Options:
-      --repo TEXT  Name of specific repository to run against. If not provided,
-                   uses all repos.
+      --repo TEXT               Name of specific repository to run against. Can
+                                use --repo multiple times. If not provided, uses
+                                all repos.
       --help       Show this message and exit.
 
 Testing
