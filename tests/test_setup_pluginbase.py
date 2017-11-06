@@ -2,8 +2,8 @@
 
 import pytest
 
-from lavatory.utils.setup_pluginbase import setup_pluginbase, get_policy
 from lavatory.exceptions import InvalidPoliciesDirectory
+from lavatory.utils.setup_pluginbase import get_policy, setup_pluginbase
 
 
 def test_default_policy_load():
@@ -22,9 +22,10 @@ def test_extra_policies_path_load(tmpdir):
 
 def test_bad_policies_path(tmpdir):
     """Tests that an exception is raised for invalid path"""
-    invalid_path = str(tmpdir)+'/bad'
+    invalid_path = str(tmpdir) + '/bad'
     with pytest.raises(InvalidPoliciesDirectory):
         plugin_source = setup_pluginbase(extra_policies_path=invalid_path)
+
 
 def test_get_default_policy():
     """tests get_policy function for default policy."""
@@ -32,6 +33,7 @@ def test_get_default_policy():
     repository = "test"
     test_policy = get_policy(plugin_source, repository)
     assert test_policy.__name__.endswith(".default")
+
 
 def test_get_custom_policy(tmpdir):
     """tests get_policy function for custom policy."""
@@ -41,4 +43,3 @@ def test_get_custom_policy(tmpdir):
     repository = "test-repo"
     test_policy = get_policy(plugin_source, repository)
     assert test_policy.__name__.endswith(".test_repo")
-    
