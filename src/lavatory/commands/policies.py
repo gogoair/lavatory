@@ -1,5 +1,6 @@
 """List policies and descriptions"""
 import inspect
+import json
 import logging
 
 import click 
@@ -20,6 +21,7 @@ LOG = logging.getLogger(__name__)
     required=False,
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
 def policies(ctx, policies_path, repo):
+    """Prints out a JSON list of all repos and policy descriptions."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s,', ctx, policies_path, repo)
     artifactory = Artifactory(repo_name=None)
     all_repos = artifactory.list()
@@ -29,11 +31,15 @@ def policies(ctx, policies_path, repo):
         selected_repos = all_repos.keys()
     
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
+    policy_list = []
     for repository in selected_repos:
         policy_name = repository.replace("-", "_")
         try:
             policy = plugin_source.load_plugin(policy_name)
         except ImportError:
             policy = plugin_source.load_plugin('default')
-        
-        click.echo("{} - {}".format(repository, inspect.getdoc(policy.purgelist)))
+        policy_disc = inspect.getdoc(policy.purgelist)    
+        policy_list.append({"repo": repository, "policy": policy_disc})
+        LOG.info("{} - {}".format(repository, policy_disc))
+    
+    click.echo(json.dumps(policy_list))
