@@ -7,6 +7,8 @@ Lavatory
 Tooling to define repository specific retention policies in Artifactory.
 Allows highly customizable retention policies via Python plugins.
 
+See `Lavatory Documentation`_ for the full docs. 
+
 Requirements
 ------------
 
@@ -86,6 +88,13 @@ If you want to run Lavatory against a specific repository, you can use ``--repo 
 You can specify ``--repo`` as multiple times to run against multiple repos. If ``--repo`` is not
 provided, Lavatory will run against all repos in Artifactory.  
 
+Policies
+--------
+
+See the `Creating Retention Policies`_ docs for more details on how
+to create and use retention policies with Lavatory.
+
+
 Testing
 -------
 
@@ -100,3 +109,6 @@ Testing
 .. |Doc Status| image:: https://readthedocs.org/projects/lavatory/badge/?version=latest
    :target: http://lavatory.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status   
+
+.. _`Lavatory Documentation`: http://lavatory.readthedocs.io/en/latest/index.html  
+.. _`Creating Retention Policies`: http://lavatory.readthedocs.io/en/latest/policies/index.html
