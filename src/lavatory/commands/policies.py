@@ -6,7 +6,7 @@ import logging
 import click 
 
 from ..utils.artifactory import Artifactory
-from ..utils.setup_pluginbase import setup_pluginbase
+from ..utils.setup_pluginbase import setup_pluginbase, get_policy
 
 LOG = logging.getLogger(__name__)
 
@@ -33,13 +33,9 @@ def policies(ctx, policies_path, repo):
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     policy_list = []
     for repository in selected_repos:
-        policy_name = repository.replace("-", "_")
-        try:
-            policy = plugin_source.load_plugin(policy_name)
-        except ImportError:
-            policy = plugin_source.load_plugin('default')
-        policy_disc = inspect.getdoc(policy.purgelist)    
-        policy_list.append({"repo": repository, "policy": policy_disc})
-        LOG.info("{} - {}".format(repository, policy_disc))
+        policy = get_policy(plugin_source, repository)
+        policy_desc = inspect.getdoc(policy.purgelist)    
+        policy_list.append({"repo": repository, "policy": policy_desc})
+        LOG.info("{} - {}".format(repository, policy_desc))
     
     click.echo(json.dumps(policy_list))

@@ -30,3 +30,26 @@ def setup_pluginbase(extra_policies_path=None):
     plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
     LOG.debug("Policies found: %s", str(plugin_source.list_plugins()))
     return plugin_source
+
+def get_policy(plugin_source, repository, default=True):
+    """Gets policy from plugin_source.
+
+    Args:
+        plugin_source (PluginBase): the plugin source from loading plugin_base.
+        repository (string): Name of repository. 
+        default (bool): If to load the default policy. 
+    
+    Returns:
+        policy (func): The policy python module.
+    """
+    policy_name = repository.replace("-", "_")
+    try:
+        policy = plugin_source.load_plugin(policy_name)
+    except ImportError:
+        if default:
+            LOG.info("No policy found for %s. Applying Default", repository)
+            policy = plugin_source.load_plugin('default')
+        else:
+            LOG.info("No policy found for %s. Skipping Default", repository)
+            policy = None
+    return policy
