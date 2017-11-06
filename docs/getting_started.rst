@@ -15,10 +15,31 @@ Lavatory looks for 3 enviroment variables in order to authenticate:
 These will be loaded in at the beginning of a run and raise an exception
 if missing.
 
+
 Purging Artifacts
 -----------------
 
-``lavatory purge --policies-path=/path/to/policies``
+Creating a Basic Policy
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For this documentation lets assume a repository named ``yum-local``. In a new directory, outside of Lavatory, create
+``yum_local.py``. This will be a retention policy that only impacts the ``yum-local`` repository.
+
+In ``yum_local.py`` lets create a basic policy:
+
+::
+
+    def purgelist(artifactory):
+        """Policy to purge all artifacts older than 120 days"""
+        purgable = artifactory.time_based_retention(keep_days=120)
+        return purgable
+
+Running Lavatory
+~~~~~~~~~~~~~~~~
+
+To test the policy you just created you can run ``lavatory purge --policies-path=/path/to/policies --repo yum-local``
+
+Below are all the options for the ``purge`` command:
 
 ::
 
