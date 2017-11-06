@@ -2,7 +2,7 @@
 
 import pytest
 
-from lavatory.utils.setup_pluginbase import setup_pluginbase
+from lavatory.utils.setup_pluginbase import setup_pluginbase, get_policy
 from lavatory.exceptions import InvalidPoliciesDirectory
 
 
@@ -25,3 +25,20 @@ def test_bad_policies_path(tmpdir):
     invalid_path = str(tmpdir)+'/bad'
     with pytest.raises(InvalidPoliciesDirectory):
         plugin_source = setup_pluginbase(extra_policies_path=invalid_path)
+
+def test_get_default_policy():
+    """tests get_policy function for default policy."""
+    plugin_source = setup_pluginbase(extra_policies_path=None)
+    repository = "test"
+    test_policy = get_policy(plugin_source, repository)
+    assert test_policy.__name__.endswith(".default")
+
+def test_get_custom_policy(tmpdir):
+    """tests get_policy function for custom policy."""
+    temp_policy = tmpdir.join('test_repo.py')
+    temp_policy.write(' ')
+    plugin_source = setup_pluginbase(extra_policies_path=str(tmpdir))
+    repository = "test-repo"
+    test_policy = get_policy(plugin_source, repository)
+    assert test_policy.__name__.endswith(".test_repo")
+    
