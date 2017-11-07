@@ -31,11 +31,23 @@ def policies(ctx, policies_path, repo):
         selected_repos = all_repos.keys()
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
-    policy_list = []
-    for repository in selected_repos:
-        policy = get_policy(plugin_source, repository)
-        policy_desc = inspect.getdoc(policy.purgelist)
-        policy_list.append({"repo": repository, "policy": policy_desc})
-        LOG.info("{} - {}".format(repository, policy_desc))
-
+    policy_list = [get_description(plugin_source, r) for r in selected_repos]
     click.echo(json.dumps(policy_list))
+
+def get_description(plugin_source, repository):
+    """Given a repository and plugin source, gets policy description.
+
+    Args:
+        plugin_source (PluginBase): The source of plugins from PluginBase.
+        repository (str): The name fo the repository to get policy description.
+    
+    Returns:
+        dict: A dictionary of repo name and policy description
+    """
+    policy = get_policy(plugin_source, repository)
+    policy_desc = inspect.getdoc(policy.purgelist)
+    policy_dict = {"repo": repository, "policy_description": policy_desc}
+    LOG.info("{} - {}".format(repository, policy_desc))
+    return policy_dict
+
+    
