@@ -22,7 +22,7 @@ LOG = logging.getLogger(__name__)
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
 def policies(ctx, policies_path, repo):
     """Prints out a JSON list of all repos and policy descriptions."""
-    LOG.debug('Passed args: %s, %s, %s, %s, %s,', ctx, policies_path, repo)
+    LOG.debug('Passed args: %s, %s, %s', ctx, policies_path, repo)
     artifactory = Artifactory(repo_name=None)
     all_repos = artifactory.list()
     if repo:
@@ -33,6 +33,7 @@ def policies(ctx, policies_path, repo):
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     policy_list = [get_description(plugin_source, r) for r in selected_repos]
     click.echo(json.dumps(policy_list))
+
 
 def get_description(plugin_source, repository):
     """Given a repository and plugin source, gets policy description.
@@ -47,7 +48,5 @@ def get_description(plugin_source, repository):
     policy = get_policy(plugin_source, repository)
     policy_desc = inspect.getdoc(policy.purgelist)
     policy_dict = {"repo": repository, "policy_description": policy_desc}
-    LOG.info("{} - {}".format(repository, policy_desc))
+    LOG.info("%s - %s", repository, policy_desc)
     return policy_dict
-
-    
