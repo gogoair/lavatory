@@ -181,7 +181,12 @@ class Artifactory(object):
         purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=aql_terms)
         return sorted(purgable_artifacts, key=lambda k: k['path'])
 
-    def count_based_retention(self, retention_count=None, project_depth=2, artifact_depth=3, item_type='folder'):
+    def count_based_retention(self,
+                              retention_count=None,
+                              project_depth=2,
+                              artifact_depth=3,
+                              item_type='folder',
+                              extra_aql=None):
         """Return all artifacts except the <count> most recent.
 
         Args:
@@ -189,6 +194,7 @@ class Artifactory(object):
             project_depth (int):  how far down the Artifactory folder hierarchy to look for projects.
             artifact_depth (int):  how far down the Artifactory folder hierarchy to look for specific artifacts.
             item_type (str): The item type to search for (file/folder/any).
+            extra_aql (list). List of extra AQL terms to apply to search
 
         Returns:
             list: List of all artifacts to delete.
@@ -197,15 +203,21 @@ class Artifactory(object):
         LOG.info("Searching for purgable artifacts with count based retention in %s.", self.repo_name)
         for project in self.filter(depth=project_depth):
             LOG.debug("Processing artifacts for project %s", project)
-            path = "{}/{}".format(project["path"], project["name"])
+            if project['path'] == '.':
+                path = "{}".format(project["name"])
+            else:
+                path = "{}/{}".format(project["path"], project["name"])
+            terms = [{"path": path}]
+            if extra_aql:
+                terms += extra_aql
             purgable_artifacts.extend(
                 self.filter(
                     offset=retention_count,
                     item_type=item_type,
                     depth=artifact_depth,
-                    terms=[{
-                        "path": path
-                    }],
-                    sort={"$desc": ["created"]}))
+                    terms=terms,
+                    sort={
+                        "$desc": ["created"]
+                    }))
 
         return sorted(purgable_artifacts, key=lambda k: k['path'])
