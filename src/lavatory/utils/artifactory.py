@@ -64,13 +64,14 @@ class Artifactory(object):
         LOG.info('Running mode: %s', mode)
 
         for artifact in artifacts:
-            artifact_path = '{}/{}'.format(artifact['path'], artifact['name'])
-            LOG.info('%s purge %s:%s', mode, self.repo_name, artifact_path)
+            artifact_path = '{}/{}/{}'.format(self.repo_name, artifact['path'], artifact['name'])
+            LOG.info('%s purge %s', mode, artifact_path)
+            full_artifact_url = '{}/{}'.format(self.base_url, artifact_path)
             if dry_run:
                 purged += 1
             else:
                 try:
-                    self.artifactory.delete(artifact_path)
+                    self.artifactory.query_artifactory(full_artifact_url, query_type='delete')
                     purged += 1
                 except (BaseHTTPError, HTTPError, InvalidURL, RequestException, ConnectionError) as error:
                     LOG.error(str(error))
