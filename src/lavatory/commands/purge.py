@@ -23,13 +23,15 @@ LOG = logging.getLogger(__name__)
     multiple=True,
     required=False,
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
-def purge(ctx, dryrun, policies_path, default, repo):
+@click.option('--repo-type', default='local', required=False, type=click.Choice(['local', 'virtual', 'cache', 'any']),
+              help="The types of repositories to search for. Local repositories by default.")
+def purge(ctx, dryrun, policies_path, default, repo, repo_type):
     """Deletes artifacts based on retention policies."""
-    LOG.debug('Passed args: %s, %s, %s, %s, %s,', ctx, dryrun, policies_path, default, repo)
+    LOG.debug('Passed args: %s, %s, %s, %s, %s, %s', ctx, dryrun, policies_path, default, repo, repo_type)
     artifactory = Artifactory(repo_name=None)
-    before_purge_data = artifactory.list()
+    before_purge_data = artifactory.list(repo_type=repo_type)
     if repo:
-        selected_repos = repo
+        selected_repos = rep
     else:
         selected_repos = before_purge_data.keys()
 

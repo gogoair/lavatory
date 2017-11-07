@@ -29,12 +29,12 @@ class Artifactory(object):
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
         self.artifactory.certbundle = certifi.where()
 
-    def list(self, repo_type='LOCAL'):
+    def list(self, repo_type='local'):
         """
         Return a dictionary of repos with basic info about each.
 
         Args:
-            repo_type (str): Type of repository to list. (LOCAL/VIRTUAL/CACHE/ANY)
+            repo_type (str): Type of repository to list. (local/virtual/cache/any)
 
         Returns:
             repos (dict): Dictionary of repos.
@@ -47,8 +47,8 @@ class Artifactory(object):
         for repo in data["repositoriesSummaryList"]:
             if repo['repoKey'] == "TOTAL":
                 continue
-            if repo['repoType'] != repo_type and repo_type != 'ANY':
-                LOG.debug("Skipping repo %s, not of type %s", repoKey())
+            if repo['repoType'].lower() != repo_type and repo_type != 'any':
+                LOG.debug("Skipping repo %s, not of type %s", repo['repoKey'], repo_type)
                 continue
 
             repos[repo['repoKey']] = repo

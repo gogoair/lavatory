@@ -20,11 +20,17 @@ LOG = logging.getLogger(__name__)
     multiple=True,
     required=False,
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
-def policies(ctx, policies_path, repo):
+@click.option('--repo-type', default='local', required=False, type=click.Choice(['local', 'virtual', 'cache', 'any']),
+              help="The types of repositories to search for. Local repositories by default.")
+def policies(ctx, policies_path, repo, repo_type):
     """Prints out a JSON list of all repos and policy descriptions."""
+<<<<<<< HEAD
     LOG.debug('Passed args: %s, %s, %s', ctx, policies_path, repo)
+=======
+    LOG.debug('Passed args: %s, %s, %s, %s', ctx, policies_path, repo, repo_type)
+>>>>>>> added repo_type option to specify what types of repos to use. Local is default
     artifactory = Artifactory(repo_name=None)
-    all_repos = artifactory.list()
+    all_repos = artifactory.list(repo_type=repo_type)
     if repo:
         selected_repos = repo
     else:
