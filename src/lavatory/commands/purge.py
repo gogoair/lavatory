@@ -6,9 +6,9 @@ import click
 
 from ..consts import REPO_TYPES
 from ..utils.artifactory import Artifactory
-from ..utils.performance import get_performance_report
-from ..utils.setup_pluginbase import setup_pluginbase, get_policy
 from ..utils.get_artifactory_info import get_artifactory_info
+from ..utils.performance import get_performance_report
+from ..utils.setup_pluginbase import get_policy, setup_pluginbase
 
 LOG = logging.getLogger(__name__)
 
