@@ -8,6 +8,7 @@ from ..consts import REPO_TYPES
 from ..utils.artifactory import Artifactory
 from ..utils.performance import get_performance_report
 from ..utils.setup_pluginbase import setup_pluginbase, get_policy
+from ..utils.get_artifactory_info import get_artifactory_info
 
 LOG = logging.getLogger(__name__)
 
@@ -36,15 +37,11 @@ LOG = logging.getLogger(__name__)
 def purge(ctx, dryrun, policies_path, default, repo, repo_type):
     """Deletes artifacts based on retention policies."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s, %s', ctx, dryrun, policies_path, default, repo, repo_type)
-    artifactory = Artifactory(repo_name=None)
-    before_purge_data = artifactory.list(repo_type=repo_type)
-    if repo:
-        selected_repos = repo
-    else:
-        selected_repos = before_purge_data.keys()
+
+    storage_info, selected_repos = get_artifactory_info(repo_name=None, repo_type=repo_type)
 
     apply_purge_policies(selected_repos, policies_path=policies_path, dryrun=dryrun, default=default)
-    generate_purge_report(selected_repos, before_purge_data)
+    generate_purge_report(selected_repos, storage_info)
 
     LOG.info("Success.")
     return True
