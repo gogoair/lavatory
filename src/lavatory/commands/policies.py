@@ -6,8 +6,8 @@ import logging
 import click
 
 from ..consts import REPO_TYPES
-from ..utils.artifactory import Artifactory
 from ..utils.setup_pluginbase import get_policy, setup_pluginbase
+from ..utils.get_artifactory_info import get_artifactory_info
 
 LOG = logging.getLogger(__name__)
 
@@ -32,12 +32,8 @@ LOG = logging.getLogger(__name__)
 def policies(ctx, policies_path, repo, repo_type):
     """Prints out a JSON list of all repos and policy descriptions."""
     LOG.debug('Passed args: %s, %s, %s, %s', ctx, policies_path, repo, repo_type)
-    artifactory = Artifactory(repo_name=None)
-    all_repos = artifactory.list(repo_type=repo_type)
-    if repo:
-        selected_repos = repo
-    else:
-        selected_repos = all_repos.keys()
+
+    storage_info, selected_repos = get_artifactory_info(repo_name=None, repo_type=repo_type)
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     policy_list = [get_description(plugin_source, r) for r in selected_repos]

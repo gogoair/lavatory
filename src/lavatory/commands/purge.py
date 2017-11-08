@@ -79,6 +79,7 @@ def generate_purge_report(purged_repos, before_purge_data):
     LOG.info("Purging Performance:")
     artifactory = Artifactory(repo_name=None)
     after_purge_data = artifactory.list()
+
     for repo, info in after_purge_data.items():
         if repo in purged_repos:
             try:
