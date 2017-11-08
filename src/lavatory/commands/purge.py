@@ -31,7 +31,7 @@ def purge(ctx, dryrun, policies_path, default, repo, repo_type):
     artifactory = Artifactory(repo_name=None)
     before_purge_data = artifactory.list(repo_type=repo_type)
     if repo:
-        selected_repos = rep
+        selected_repos = repo
     else:
         selected_repos = before_purge_data.keys()
 
