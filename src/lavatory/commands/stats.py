@@ -3,7 +3,7 @@ import logging
 
 import click
 
-from ..utils.artifactory import Artifactory
+from ..utils.get_artifactory_info import get_artifactory_info
 
 LOG = logging.getLogger(__name__)
 
@@ -19,13 +19,7 @@ LOG = logging.getLogger(__name__)
 def stats(ctx, repo):
     """Get statistics of repos."""
     LOG.debug('Passed args: %s, %s.', ctx, repo)
-    artifactory = Artifactory(repo_name=None)
-    storage = artifactory.list()
-
-    if not repo:
-        keys = storage.keys()
-    else:
-        keys = repo
+    storage, keys = get_artifactory_info(repo_name=repo, repo_type='any')
 
     for repository in keys:
         repo = storage.get(repository)
