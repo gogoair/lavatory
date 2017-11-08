@@ -73,17 +73,20 @@ Purging Artifacts
     $ lavatory purge --help
     Usage: lavatory purge [OPTIONS]
 
-      Deletes artifacts based on retention policies
+      Deletes artifacts based on retention policies.
 
     Options:
-      --policies-path TEXT      Path to extra policies directory
-      --dryrun / --nodryrun     Dryrun does not delete any artifacts. On by
-                                default
-      --default / --no-default  If false, does not apply default policy
-      --repo TEXT               Name of specific repository to run against. Can
-                                use --repo multiple times. If not provided, uses
-                                all repos.
-      --help                    Show this message and exit.
+      --policies-path TEXT            Path to extra policies directory.
+      --dryrun / --nodryrun           Dryrun does not delete any artifacts. On by
+                                      default.
+      --default / --no-default        If false, does not apply default policy.
+      --repo TEXT                     Name of specific repository to run against.
+                                      Can use --repo multiple times. If not
+                                      provided, uses all repos.
+      --repo-type [local|virtual|cache|any]
+                                      The types of repositories to search for.
+                                      Local repositories by default.
+      --help                          Show this message and exit.
 
 If you want to run Lavatory against a specific repository, you can use ``--repo <repo_name>``.
 You can specify ``--repo`` as multiple times to run against multiple repos. If ``--repo`` is not
@@ -94,6 +97,29 @@ Policies
 
 See the `Creating Retention Policies`_ docs for more details on how
 to create and use retention policies with Lavatory.
+
+Listing Policies
+~~~~~~~~~~~~~~~~
+
+Lavatory looks at a policy functions docstring in order to get a description. You can list all repos and a description
+of the policy that would apply to them with the ``lavatory policies`` command.
+
+::
+
+    $ lavatory policies --help
+    Usage: lavatory policies [OPTIONS]
+
+      Prints out a JSON list of all repos and policy descriptions.
+
+    Options:
+      --policies-path TEXT            Path to extra policies directory.
+      --repo TEXT                     Name of specific repository to run against.
+                                      Can use --repo multiple times. If not
+                                      provided, uses all repos.
+      --repo-type [local|virtual|cache|any]
+                                      The types of repositories to search for.
+                                      Local repositories by default.
+      --help                          Show this message and exit.
 
 
 Getting Statistics
