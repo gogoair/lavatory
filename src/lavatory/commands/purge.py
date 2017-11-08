@@ -4,6 +4,7 @@ import logging
 
 import click
 
+from ..consts import REPO_TYPES
 from ..utils.artifactory import Artifactory
 from ..utils.performance import get_performance_report
 from ..utils.setup_pluginbase import setup_pluginbase, get_policy
@@ -13,18 +14,25 @@ LOG = logging.getLogger(__name__)
 
 @click.command()
 @click.pass_context
-@click.option('--policies-path', required=False, help='Path to extra policies directory.')
+@click.option('--policies-path', required=False, help='Path to extra policies directory.', show_default=True)
 @click.option(
-    '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts. On by default.')
-@click.option('--default/--no-default', default=True, is_flag=True, help='If false, does not apply default policy.')
+    '--dryrun/--nodryrun', default=True, is_flag=True, help='Dryrun does not delete any artifacts.', show_default=True)
+@click.option(
+    '--default/--no-default', default=True, is_flag=True, help='Applies default retention policy.', show_default=True)
 @click.option(
     '--repo',
     default=None,
     multiple=True,
     required=False,
+    show_default=True,
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
-@click.option('--repo-type', default='local', required=False, type=click.Choice(['local', 'virtual', 'cache', 'any']),
-              help="The types of repositories to search for. Local repositories by default.")
+@click.option(
+    '--repo-type',
+    default='local',
+    required=False,
+    type=click.Choice(REPO_TYPES),
+    show_default=True,
+    help="The types of repositories to search for.")
 def purge(ctx, dryrun, policies_path, default, repo, repo_type):
     """Deletes artifacts based on retention policies."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s, %s', ctx, dryrun, policies_path, default, repo, repo_type)

@@ -5,6 +5,7 @@ import logging
 
 import click
 
+from ..consts import REPO_TYPES
 from ..utils.artifactory import Artifactory
 from ..utils.setup_pluginbase import get_policy, setup_pluginbase
 
@@ -13,15 +14,21 @@ LOG = logging.getLogger(__name__)
 
 @click.command()
 @click.pass_context
-@click.option('--policies-path', required=False, help='Path to extra policies directory.')
+@click.option('--policies-path', required=False, help='Path to extra policies directory.', show_default=True)
 @click.option(
     '--repo',
     default=None,
     multiple=True,
     required=False,
+    show_default=True,
     help='Name of specific repository to run against. Can use --repo multiple times. If not provided, uses all repos.')
-@click.option('--repo-type', default='local', required=False, type=click.Choice(['local', 'virtual', 'cache', 'any']),
-              help="The types of repositories to search for. Local repositories by default.")
+@click.option(
+    '--repo-type',
+    default='local',
+    required=False,
+    type=click.Choice(REPO_TYPES),
+    show_default=True,
+    help="The types of repositories to search for.")
 def policies(ctx, policies_path, repo, repo_type):
     """Prints out a JSON list of all repos and policy descriptions."""
     LOG.debug('Passed args: %s, %s, %s, %s', ctx, policies_path, repo, repo_type)

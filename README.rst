@@ -69,7 +69,6 @@ Purging Artifacts
 ``lavatory purge --policies-path=/path/to/policies``
 
 ::
-
     $ lavatory purge --help
     Usage: lavatory purge [OPTIONS]
 
@@ -77,20 +76,39 @@ Purging Artifacts
 
     Options:
       --policies-path TEXT            Path to extra policies directory.
-      --dryrun / --nodryrun           Dryrun does not delete any artifacts. On by
-                                      default.
-      --default / --no-default        If false, does not apply default policy.
+      --dryrun / --nodryrun           Dryrun does not delete any artifacts.
+                                      [default: True]
+      --default / --no-default        Applies default retention policy.  [default:
+                                      True]
       --repo TEXT                     Name of specific repository to run against.
                                       Can use --repo multiple times. If not
                                       provided, uses all repos.
       --repo-type [local|virtual|cache|any]
                                       The types of repositories to search for.
-                                      Local repositories by default.
+                                      [default: local]
       --help                          Show this message and exit.
+
 
 If you want to run Lavatory against a specific repository, you can use ``--repo <repo_name>``.
 You can specify ``--repo`` as multiple times to run against multiple repos. If ``--repo`` is not
 provided, Lavatory will run against all repos in Artifactory.  
+
+Getting Statistics
+~~~~~~~~~~~~~~~~~~
+``lavatory stats --repo test-local``
+
+::
+
+    $ lavatory stats --help
+    Usage: lavatory stats [OPTIONS]
+
+      Get statistics of a repo.
+
+    Options:
+      --repo TEXT               Name of specific repository to run against. Can
+                                use --repo multiple times. If not provided, uses
+                                all repos.
+      --help       Show this message and exit.
 
 Policies
 --------
@@ -118,26 +136,8 @@ of the policy that would apply to them with the ``lavatory policies`` command.
                                       provided, uses all repos.
       --repo-type [local|virtual|cache|any]
                                       The types of repositories to search for.
-                                      Local repositories by default.
+                                      [default: local]
       --help                          Show this message and exit.
-
-
-Getting Statistics
-~~~~~~~~~~~~~~~~~
-``lavatory stats --repo test-local``
-
-::
-
-    $ lavatory stats --help
-    Usage: lavatory stats [OPTIONS]
-
-      Get statistics of a repo.
-
-    Options:
-      --repo TEXT               Name of specific repository to run against. Can
-                                use --repo multiple times. If not provided, uses
-                                all repos.
-      --help       Show this message and exit.
 
 Testing
 -------
