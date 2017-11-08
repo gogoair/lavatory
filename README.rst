@@ -1,4 +1,4 @@
-|Build Status| |Doc Status|
+|Build Status| |Doc Status| |PyPi Badge|
 
 
 Lavatory
@@ -154,6 +154,9 @@ Testing
 .. |Doc Status| image:: https://readthedocs.org/projects/lavatory/badge/?version=latest
    :target: http://lavatory.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status   
+
+.. |PyPi Badge| image:: https://badge.fury.io/py/lavatory.svg
+    :target: https://badge.fury.io/py/lavatory
 
 .. _`Lavatory Documentation`: http://lavatory.readthedocs.io/en/latest/index.html  
 .. _`Creating Retention Policies`: http://lavatory.readthedocs.io/en/latest/policies/index.html
