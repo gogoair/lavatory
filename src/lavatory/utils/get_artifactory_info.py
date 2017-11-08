@@ -1,4 +1,6 @@
 """Helper method for getting artifactory information."""
+import logging
+
 from .artifactory import Artifactory
 
 
@@ -20,5 +22,8 @@ def get_artifactory_info(repo_name=None, repo_type='local'):
         keys = repo_name
     else:
         keys = storage_info.keys()
+
+    logging.debug('Storage info: %s', storage_info)
+    logging.debug('Keys: %s', keys)
 
     return storage_info, keys
