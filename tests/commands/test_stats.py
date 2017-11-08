@@ -9,7 +9,7 @@ def runner():
     return CliRunner()
 
 
-@mock.patch('lavatory.commands.stats.Artifactory')
+@mock.patch('lavatory.commands.stats.get_artifactory_info')
 def test_command_stats(mock_artifactory, runner):
     data = {
         'test-local': {
@@ -23,7 +23,8 @@ def test_command_stats(mock_artifactory, runner):
             'percentage': '8.05%'
         }
     }
-    mock_artifactory.return_value.list.return_value = data
+    key = {}
+    mock_artifactory.return_value = data, key
     result = runner.invoke(stats, ['--repo', 'test-local'])
     assert result.exit_code == 0
     assert result.output == 'Done.\n'
