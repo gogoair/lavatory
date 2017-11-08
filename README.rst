@@ -69,6 +69,7 @@ Purging Artifacts
 ``lavatory purge --policies-path=/path/to/policies``
 
 ::
+
     $ lavatory purge --help
     Usage: lavatory purge [OPTIONS]
 
