@@ -38,7 +38,7 @@ def purge(ctx, dryrun, policies_path, default, repo, repo_type):
     """Deletes artifacts based on retention policies."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s, %s', ctx, dryrun, policies_path, default, repo, repo_type)
 
-    storage_info, selected_repos = get_artifactory_info(repo_name=None, repo_type=repo_type)
+    storage_info, selected_repos = get_artifactory_info(repo_name=repo, repo_type=repo_type)
 
     apply_purge_policies(selected_repos, policies_path=policies_path, dryrun=dryrun, default=default)
     generate_purge_report(selected_repos, storage_info)
