@@ -38,3 +38,12 @@ def test_get_artifact_properties(mock_properties, artifactory):
     test_artifact = {"name": "test", "path": "path/to/test"}
     props = artifactory.get_artifact_properties(test_artifact)
     assert props == TEST_PROPS
+
+@mock.patch('lavatory.utils.artifactory.party.Party.post')
+def test_move_artifacts(artifactory):
+    test_artifacts = [{"name": "test", "path": "path/to/test"},
+                      {"name": "test2", "path": "path/to/test2"}]
+    moved = artifactory.move_artifacts(artifacts=test_artifacts,
+                                       dest_repository='test_repo')
+    assert moved
+

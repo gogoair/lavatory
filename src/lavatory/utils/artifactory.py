@@ -99,6 +99,7 @@ class Artifactory(object):
             r = self.artifactory.post(move_url)
             if not r.ok:
                 LOG.warning("error moving artifact %s: %s", artifact['name'], r.text)
+        return True
 
     # pylint: disable-msg=too-many-arguments
     def filter(self, terms=None, depth=3, sort=None, offset=0, limit=0, fields=None, item_type="folder"):
