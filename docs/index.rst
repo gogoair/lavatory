@@ -17,6 +17,7 @@ Contents
 
    getting_started
    policies/index
+   policies/example_policies
    RELEASING
    lavatory/modules
    CHANGELOG

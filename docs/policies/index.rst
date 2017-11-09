@@ -60,4 +60,4 @@ Example Minimal Return:
 
 This will delete artifact ``<repo_name>/222/Application-10.6.0-10.6.0.07-9cd3c33.iso``
 
-.. include:: example_policies.rst
+.. include:: policy_helpers.rst
