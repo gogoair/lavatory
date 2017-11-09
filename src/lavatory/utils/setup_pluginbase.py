@@ -31,6 +31,7 @@ def setup_pluginbase(extra_policies_path=None):
     LOG.debug("Policies found: %s", str(plugin_source.list_plugins()))
     return plugin_source
 
+
 def get_policy(plugin_source, repository, default=True):
     """Gets policy from plugin_source.
 

@@ -23,8 +23,13 @@ def test_command_stats(mock_artifactory, runner):
             'percentage': '8.05%'
         }
     }
-    key = {}
+    key = data.keys()
     mock_artifactory.return_value = data, key
-    result = runner.invoke(stats, ['--repo', 'test-local'])
-    assert result.exit_code == 0
-    assert result.output == 'Done.\n'
+    result_one = runner.invoke(stats, ['--repo', 'test-local'])
+    result_two = runner.invoke(stats)
+
+    assert result_one.exit_code == 0
+    assert result_one.output == 'Done.\n'
+    assert result_two.exit_code == 0
+    assert result_two.output == 'Done.\n'
+
