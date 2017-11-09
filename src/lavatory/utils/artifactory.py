@@ -84,6 +84,23 @@ class Artifactory(object):
 
         return purged
 
+    def move_artifacts(self, artifacts=None, dest_repository=None):
+        """Moves a list of artifacts to dest_repository.
+        
+        Args:
+            artifacts (list): List of artifacts to move.
+            dest_repository (str): The name of the destination repo.
+        """
+        base_endpoint = "move/{}".format(self.repo_name)
+        dest_prefix = "?to=/{}".format(dest_repository)
+        for artifact in artifacts:
+            move_url = "{0}/{1}/{2}{3}/{1}/{2}".format(base_endpoint, artifact['path'], artifact['name'], dest_prefix)
+            LOG.info("Moving %s to repository %s", artifact['name'], dest_repository)
+            r = self.artifactory.post(move_url)
+            if not r.ok:
+                LOG.warning("error moving artifact %s: %s", artifact['name'], r.text)
+            
+            
     # pylint: disable-msg=too-many-arguments
     def filter(self, terms=None, depth=3, sort=None, offset=0, limit=0, fields=None, item_type="folder"):
         """Get a subset of artifacts from the specified repo.
