@@ -1,8 +1,10 @@
+"""Tests for policies command."""
+from unittest import mock
+
 import pytest
 from click.testing import CliRunner
-from lavatory.commands.policies import policies
-from unittest import mock
-from lavatory.commands.policies import get_description, get_policy
+
+from lavatory.commands.policies import get_description, policies
 
 
 @pytest.fixture(scope="module")
@@ -38,3 +40,5 @@ def test_policies(mock_get_art_info, runner):
     result_one = runner.invoke(policies)
 
     assert result_one.exit_code == 0
+    assert isinstance(result_one.output, str)
+    assert 'test-local' in result_one.output

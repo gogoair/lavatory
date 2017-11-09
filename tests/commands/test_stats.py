@@ -1,7 +1,10 @@
+"""Tests for stats command."""
+from unittest import mock
+
 import pytest
 from click.testing import CliRunner
+
 from lavatory.commands.stats import stats
-from unittest import mock
 
 
 @pytest.fixture(scope="module")
@@ -32,4 +35,3 @@ def test_command_stats(mock_artifactory, runner):
     assert result_one.output == 'Done.\n'
     assert result_two.exit_code == 0
     assert result_two.output == 'Done.\n'
-
