@@ -34,6 +34,15 @@ In ``yum_local.py`` lets create a basic policy:
         purgable = artifactory.time_based_retention(keep_days=120)
         return purgable
 
+The layout of the policy will look similar to ::
+
+    [root@localhost /]# tree path/
+    path
+    `-- to
+        `-- policies
+            `-- yum_local.py
+
+
 Running Lavatory
 ~~~~~~~~~~~~~~~~
 
