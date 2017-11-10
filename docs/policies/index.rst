@@ -20,7 +20,7 @@ For example, the repository ``yum-local`` should have a retention policy named `
 Anatomy of a Policy 
 -------------------
 
-Each policy needs to provide one function, ``purgelist(artifactory)``. 
+Each policy needs to provide one function, ``purgelist()``.
 This function takes one arguement, ``artifactory`` which is an object containing
 artifactory specific functions. 
 
