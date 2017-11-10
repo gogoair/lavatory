@@ -4,7 +4,7 @@ Getting Started
 Authentication
 --------------
 
-Lavatory looks for 3 environment variables in order to authenticate:
+Lavatory looks for several environment variables in order to authenticate:
 
 ``ARTIFACTORY_URL`` - Base URL to use for Artifactory connections
 
@@ -13,7 +13,7 @@ Lavatory looks for 3 environment variables in order to authenticate:
 ``ARTIFACTORY_PASSWORD`` - Password for Artifactory
 
 These will be loaded in at the beginning of a run and raise an exception
-if missing.
+if these environment variables are missing.
 
 
 Purging Artifacts
