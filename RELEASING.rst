@@ -22,6 +22,7 @@ Upload Release
 
 When releasing a new version, the following needs to occur:
 
+#. Ensure all test via ``tox`` pass
 #. Add version Tag
 
    .. code:: bash
@@ -29,7 +30,6 @@ When releasing a new version, the following needs to occur:
       git tag -a v#.#.#
       git push --tags
 
-#. Ensure all test via ``tox`` pass
 #. Generate and upload the package
 
    .. code:: bash
