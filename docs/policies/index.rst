@@ -5,7 +5,7 @@ Creating Retention Policies
 
 .. toctree::
    :maxdepth: 2
-   
+
 .. contents::
    :local:
 
@@ -17,19 +17,19 @@ replacing ``-`` with ``_``.
 
 For example, the repository ``yum-local`` should have a retention policy named ``yum_local.py``
 
-Anatomy of a Policy 
+Anatomy of a Policy
 -------------------
 
 Each policy needs to provide one function, ``purgelist()``.
-This function takes one arguement, ``artifactory`` which is an object containing
-artifactory specific functions. 
+This function takes one argument, ``artifactory`` which is an object containing
+artifactory specific functions.
 
 This function needs to return a list of artifacts to delete.
 
-Entry Function 
+Entry Function
 ~~~~~~~~~~~~~~
 
-The entrypoint to a policy is the function ``def purgelist(artifactory)``.
+The entry point to a policy is the function ``def purgelist(artifactory)``.
 The argument is an instance of the ``lavatory.utils.artifactory.Artifactory`` class
 and handles all communication with artifactory.
 
@@ -37,7 +37,7 @@ Docstring Description
 ~~~~~~~~~~~~~~~~~~~~~
 
 The docstring following the function definition will be used as the policy description.
-This gets used in logging, as well as generating a list of all active policies. 
+This gets used in logging, as well as generating a list of all active policies.
 
 
 Return Value

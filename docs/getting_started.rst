@@ -69,7 +69,7 @@ Below are all the options for the ``purge`` command:
 
 If you want to run Lavatory against a specific repository, you can use ``--repo <repo_name>``.
 You can specify ``--repo`` as multiple times to run against multiple repos. If ``--repo`` is not
-provided, Lavatory will run against all repos in Artifactory.  
+provided, Lavatory will run against all repos in Artifactory.
 
 By default, Lavatory runs in drymode. Must include ``--nodryrun`` in order to
 actually delete Artifacts
@@ -84,5 +84,4 @@ Verbosity
 
 Adding ``lavatory -v $command`` will increase logging verbosity.
 You can add up to 5 ``v`` like ``lavatory -vvvvv $command`` for maximum
-verbosity. 
-
+verbosity.
