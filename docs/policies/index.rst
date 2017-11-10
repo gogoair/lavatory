@@ -12,8 +12,8 @@ Creating Retention Policies
 Lavatory policies are implemented as Python plugins. Each policy is a ``.py`` file named
 after an Artifactory repository.
 
-Each file/plugin represents one repository. The file name should match the 
-repository name, replacing ``-`` with ``_``.
+Each plugin represents one repository. The file name should match the repository name,
+replacing ``-`` with ``_``.
 
 For example, the repository ``yum-local`` should have a retention policy named ``yum_local.py``
 
