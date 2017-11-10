@@ -5,6 +5,8 @@ import logging
 
 import certifi
 import party
+
+# pylint: disable=redefined-builtin
 from requests.exceptions import (BaseHTTPError, ConnectionError, HTTPError, InvalidURL, RequestException)
 
 from ..credentials import load_credentials

@@ -34,7 +34,7 @@ LOG = logging.getLogger(__name__)
     type=click.Choice(REPO_TYPES),
     show_default=True,
     help="The types of repositories to search for.")
-def purge(ctx, dryrun, policies_path, default, repo, repo_type):
+def purge(ctx, dryrun, policies_path, default, repo, repo_type):  # pylint: disable=too-many-arguments
     """Deletes artifacts based on retention policies."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s, %s', ctx, dryrun, policies_path, default, repo, repo_type)
 

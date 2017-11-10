@@ -33,6 +33,7 @@ def policies(ctx, policies_path, repo, repo_type):
     """Prints out a JSON list of all repos and policy descriptions."""
     LOG.debug('Passed args: %s, %s, %s, %s', ctx, policies_path, repo, repo_type)
 
+    # pylint: disable=unused-variable
     storage_info, selected_repos = get_artifactory_info(repo_names=repo, repo_type=repo_type)
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
