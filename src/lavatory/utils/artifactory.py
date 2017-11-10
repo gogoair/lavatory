@@ -96,9 +96,9 @@ class Artifactory(object):
         for artifact in artifacts:
             move_url = "{0}/{1}/{2}{3}/{1}/{2}".format(base_endpoint, artifact['path'], artifact['name'], dest_prefix)
             LOG.info("Moving %s to repository %s", artifact['name'], dest_repository)
-            r = self.artifactory.post(move_url)
-            if not r.ok:
-                LOG.warning("error moving artifact %s: %s", artifact['name'], r.text)
+            request = self.artifactory.post(move_url)
+            if not request.ok:
+                LOG.warning("error moving artifact %s: %s", artifact['name'], request.text)
         return True
 
     # pylint: disable-msg=too-many-arguments
