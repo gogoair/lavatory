@@ -16,7 +16,7 @@ def get_artifactory_info(repo_names=None, repo_type='local'):
          storage_info (dict): Storage information api call.
     """
     artifactory = Artifactory(repo_name=repo_names)
-    storage_info = artifactory.list(repo_type=repo_type)
+    storage_info = artifactory.repos(repo_type=repo_type)
 
     if repo_names:
         keys = repo_names

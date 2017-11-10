@@ -48,7 +48,7 @@ def purge(ctx, dryrun, policies_path, default, repo, repo_type):
 
 
 def apply_purge_policies(selected_repos, policies_path=None, dryrun=True, default=True):
-    """Sets up the plugins to find purgable artifacts and delete them. 
+    """Sets up the plugins to find purgable artifacts and delete them.
 
     Args:
         selected_repos (list): List of repos to run against.
@@ -78,7 +78,7 @@ def generate_purge_report(purged_repos, before_purge_data):
     """
     LOG.info("Purging Performance:")
     artifactory = Artifactory(repo_name=None)
-    after_purge_data = artifactory.list()
+    after_purge_data = artifactory.repos()
 
     for repo, info in after_purge_data.items():
         if repo in purged_repos:

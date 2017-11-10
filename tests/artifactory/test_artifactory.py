@@ -28,7 +28,7 @@ def artifactory(mock_party, mock_credentials):
 def test_list(mock_party_request, artifactory):
     data = {'repositoriesSummaryList': [{'repoKey': 'test-local', 'repoType': 'LOCAL'}]}
     mock_party_request.return_value.json.return_value = data
-    art = artifactory.list()
+    art = artifactory.repos()
 
     assert art['test-local'] == {'repoKey': 'test-local', 'repoType': 'LOCAL'}
 
@@ -46,4 +46,3 @@ def test_move_artifacts(artifactory):
     moved = artifactory.move_artifacts(artifacts=test_artifacts,
                                        dest_repository='test_repo')
     assert moved
-

@@ -29,7 +29,7 @@ class Artifactory(object):
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
         self.artifactory.certbundle = certifi.where()
 
-    def list(self, repo_type='local'):
+    def repos(self, repo_type='local'):
         """
         Return a dictionary of repos with basic info about each.
 

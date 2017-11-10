@@ -20,7 +20,7 @@ def test_apply_purge_policies(mock_artifactory):
 @mock.patch('lavatory.commands.purge.Artifactory')
 def test_purge_report(mock_artifactory):
     """Unit test for purge report"""
-    mock_artifactory.list.return_value = {"yum-local": "", "test_local": ""}
+    mock_artifactory.repos.return_value = {"yum-local": "", "test_local": ""}
     purged_repos = ['yum-local', 'test_local']
     before_data = {"yum-local": ""}
     report = generate_purge_report(purged_repos, before_data)
@@ -57,5 +57,3 @@ def test_policies(mock_purge_report, mock_purge_policies, mock_get_art_info, run
 
     assert result_one.exit_code == 0
     assert result_one.output == ''
-
-
