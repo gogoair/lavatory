@@ -1,7 +1,6 @@
 import os
 
 from .exceptions import MissingEnvironmentVariable
-"""Handles getting Artifactory credentials from environment and raising exception if missing"""
 
 
 def load_credentials():

@@ -37,9 +37,9 @@ def get_policy(plugin_source, repository, default=True):
 
     Args:
         plugin_source (PluginBase): the plugin source from loading plugin_base.
-        repository (string): Name of repository. 
-        default (bool): If to load the default policy. 
-    
+        repository (string): Name of repository.
+        default (bool): If to load the default policy.
+
     Returns:
         policy (func): The policy python module.
     """

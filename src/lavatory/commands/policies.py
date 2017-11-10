@@ -46,7 +46,7 @@ def get_description(plugin_source, repository):
     Args:
         plugin_source (PluginBase): The source of plugins from PluginBase.
         repository (str): The name fo the repository to get policy description.
-    
+
     Returns:
         dict: A dictionary of repo name and policy description
     """
