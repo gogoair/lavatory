@@ -4,7 +4,7 @@ Getting Started
 Authentication
 --------------
 
-Lavatory looks for 3 enviroment variables in order to authenticate:
+Lavatory looks for 3 environment variables in order to authenticate:
 
 ``ARTIFACTORY_URL`` - Base URL to use for Artifactory connections
 
