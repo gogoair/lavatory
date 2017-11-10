@@ -34,4 +34,4 @@ When releasing a new version, the following needs to occur:
 
    .. code:: bash
 
-      python setup.py bdist_wheel upload -r pypi
+      python3 setup.py bdist_wheel upload -r pypi
