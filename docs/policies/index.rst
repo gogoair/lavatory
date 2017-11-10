@@ -1,5 +1,3 @@
-
-
 Creating Retention Policies
 ===========================
 
@@ -21,17 +19,12 @@ Anatomy of a Policy
 -------------------
 
 Each policy needs to provide one function, ``purgelist()``.
-This function takes one argument, ``artifactory`` which is an object containing
-artifactory specific functions.
+This function takes one argument, ``artifactory``, which is an instance of the
+``lavatory.utils.artifactory.Artifactory`` class. This argument handles all communication
+with artifactory.
 
 This function needs to return a list of artifacts to delete.
 
-Entry Function
-~~~~~~~~~~~~~~
-
-The entry point to a policy is the function ``def purgelist(artifactory)``.
-The argument is an instance of the ``lavatory.utils.artifactory.Artifactory`` class
-and handles all communication with artifactory.
 
 Docstring Description
 ~~~~~~~~~~~~~~~~~~~~~
