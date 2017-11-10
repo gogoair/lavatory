@@ -242,8 +242,6 @@ class Artifactory(object):
                     item_type=item_type,
                     depth=artifact_depth,
                     terms=terms,
-                    sort={
-                        "$desc": ["created"]
-                    }))
+                    sort={"$desc": ["created"]}))
 
         return sorted(purgable_artifacts, key=lambda k: k['path'])
