@@ -86,7 +86,7 @@ class Artifactory(object):
 
     def move_artifacts(self, artifacts=None, dest_repository=None):
         """Moves a list of artifacts to dest_repository.
-        
+
         Args:
             artifacts (list): List of artifacts to move.
             dest_repository (str): The name of the destination repo.
@@ -117,7 +117,7 @@ class Artifactory(object):
             sort (dict): How to sort Artifactory results
             offset (int): how many items from the beginning of the list should be skipped (optional)
             limit (int): the maximum number of entries to return (optional)
-            item_type (str): The itme type to search for (file/folder/any).
+            item_type (str): The item type to search for (file/folder/any).
 
         Returns:
             list: List of artifacts returned from query

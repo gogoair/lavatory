@@ -71,7 +71,7 @@ count-based retention or time-based retention helps.
         purgable = artifactory.filter(terms=aql_terms, fields=extra_fields, depth=None, item_type="any")
         return purgable
 
-All of the terms in ``aql_terms`` will be ``ANDed`` together and searched. 
+All of the terms in ``aql_terms`` will be ``ANDed`` together and searched.
 
 The above policy would use the below full AQL to search for artifacts.
 
