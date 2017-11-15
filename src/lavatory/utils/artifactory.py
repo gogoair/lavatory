@@ -181,7 +181,7 @@ class Artifactory(object):
         artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
         return sorted(artifacts, key=lambda k: k['path'])
 
-    def time_based_retention(self, keep_days=None, item_type='file', extra_aql=None):
+    def time_based_retention(self, keep_days=None, time_field='created', item_type='file', extra_aql=None):
         """Retains artifacts based on number of days since creation.
 
             extra_aql example: [{"@deployed": {"$match": "dev"}}, {"@deployed": {"$nmatch": "prod"}}]
@@ -190,6 +190,7 @@ class Artifactory(object):
 
         Args:
             keep_days (int): Number of days to keep an artifact.
+            time_field (str): The field of time to look at (created, modified, stat.downloaded).
             item_type (str): The item type to search for (file/folder/any).
             extra_aql (list). List of extra AQL terms to apply to search
 
@@ -202,7 +203,7 @@ class Artifactory(object):
         now = datetime.datetime.now()
         before = now - datetime.timedelta(days=keep_days)
         created_before = before.strftime("%Y-%m-%dT%H:%M:%SZ")
-        aql_terms = [{"created": {"$lt": created_before}}]
+        aql_terms = [{time_field: {"$lt": created_before}}]
         aql_terms.extend(extra_aql)
         purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=aql_terms)
         return sorted(purgable_artifacts, key=lambda k: k['path'])
