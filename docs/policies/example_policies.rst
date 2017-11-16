@@ -20,6 +20,17 @@ Keep last 120 days of artifacts
         return purgable
 
 
+Keep artifacts downloaded in the last 60 days
+---------------------------------------------
+
+::
+
+    def purgelist(artifactory):
+        """Policy to purge all artifacts not downloaded in last 60 days"""
+        purgable = artifactory.time_based_retention(keep_days=60, time_field='stat.downloaded')
+        return purgable
+
+
 Keep 5 most recent artifacts
 ----------------------------
 
