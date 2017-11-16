@@ -27,8 +27,8 @@ Keep artifacts downloaded in the last 60 days
 
     def purgelist(artifactory):
         """Policy to purge all artifacts not downloaded in last 60 days"""
-        purgable = artifactory.time_based_retention(keep_days=60, time_field='stat.downloaded')
-        return purgable
+        purgeable = artifactory.time_based_retention(keep_days=60, time_field='stat.downloaded')
+        return purgeable
 
 
 Keep 5 most recent artifacts
@@ -38,8 +38,8 @@ Keep 5 most recent artifacts
 
     def purgelist(artifactory):
         """Policy to keep just the 5 most recent artifacts."""
-        purgable = artifactory.count_based_retention(retention_count=5)
-        return purgable
+        purgeable = artifactory.count_based_retention(retention_count=5)
+        return purgeable
 
 
 Keep artifacts with specific properties
@@ -51,8 +51,8 @@ Keep artifacts with specific properties
         """Policy to purge artifacts with deployed property of dev and not prod."""
         aql_terms = [{"@deployed": {"$match": "dev"}}, {"@deployed": {"$nmatch": "prod"}}]
         extra_fields = ['property.*']
-        purgable = artifactory.filter(terms=aql_terms, fields=extra_fields, depth=None, item_type="any")
-        return purgable
+        purgeable = artifactory.filter(terms=aql_terms, fields=extra_fields, depth=None, item_type="any")
+        return purgeable
 
 Keep all artifacts
 ------------------
@@ -92,7 +92,7 @@ More complicated examples
                     ]
         purgeable = artifactory.filter(terms=docker_terms, depth=None, item_type="file")
 
-        return sorted(purgeable, key=lambda k: k['path'])
+        return purgeable
 
 ::
 
@@ -117,5 +117,5 @@ More complicated examples
         only_dev_purgeable = artifactory.time_based_retention(keep_days=21, extra_aql=only_dev)
         only_stage_purgeable = artifactory.time_based_retention(keep_days=30, extra_aql=only_dev)
 
-        all_purgable = undeployed_purgeable + only_dev_purgeable + only_stage_purgeable
-        return sorted(all_purgable, key=lambda k: k['path'])
+        all_purgeable = undeployed_purgeable + only_dev_purgeable + only_stage_purgeable
+        return all_purgeable

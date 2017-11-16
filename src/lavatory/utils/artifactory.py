@@ -71,6 +71,7 @@ class Artifactory(object):
         mode = 'DRYRUN' if dry_run else 'LIVE'
         LOG.info('Running mode: %s', mode)
 
+        artifacts = sorted(artifacts, key=lambda k: k['path'])
         for artifact in artifacts:
             artifact_path = '{}/{}/{}'.format(self.repo_name, artifact['path'], artifact['name'])
             LOG.info('%s purge %s', mode, artifact_path)
@@ -95,6 +96,7 @@ class Artifactory(object):
         """
         base_endpoint = "move/{}".format(self.repo_name)
         dest_prefix = "?to=/{}".format(dest_repository)
+        artifacts = sorted(artifacts, key=lambda k: k['path'])
         for artifact in artifacts:
             move_url = "{0}/{1}/{2}{3}/{1}/{2}".format(base_endpoint, artifact['path'], artifact['name'], dest_prefix)
             LOG.info("Moving %s to repository %s", artifact['name'], dest_repository)
@@ -171,7 +173,7 @@ class Artifactory(object):
             with_properties (bool): Include artifact properties or not.
 
         Returns:
-            list: Sorted list of all artifacts in a repository.
+            list: List of all artifacts in a repository.
         """
         LOG.info("Searching for all artifacts in %s.", self.repo_name)
         if with_properties:
@@ -179,7 +181,7 @@ class Artifactory(object):
         else:
             fields = []
         artifacts = self.filter(item_type=item_type, depth=depth, fields=fields)
-        return sorted(artifacts, key=lambda k: k['path'])
+        return artifacts
 
     def time_based_retention(self, keep_days=None, time_field='created', item_type='file', extra_aql=None):
         """Retains artifacts based on number of days since creation.
@@ -205,8 +207,8 @@ class Artifactory(object):
         created_before = before.strftime("%Y-%m-%dT%H:%M:%SZ")
         aql_terms = [{time_field: {"$lt": created_before}}]
         aql_terms.extend(extra_aql)
-        purgable_artifacts = self.filter(item_type=item_type, depth=None, terms=aql_terms)
-        return sorted(purgable_artifacts, key=lambda k: k['path'])
+        purgeable_artifacts = self.filter(item_type=item_type, depth=None, terms=aql_terms)
+        return purgeable_artifacts
 
     def count_based_retention(self,
                               retention_count=None,
@@ -226,7 +228,7 @@ class Artifactory(object):
         Returns:
             list: List of all artifacts to delete.
         """
-        purgable_artifacts = []
+        purgeable_artifacts = []
         LOG.info("Searching for purgable artifacts with count based retention in %s.", self.repo_name)
         for project in self.filter(depth=project_depth):
             LOG.debug("Processing artifacts for project %s", project)
@@ -237,7 +239,7 @@ class Artifactory(object):
             terms = [{"path": path}]
             if extra_aql:
                 terms += extra_aql
-            purgable_artifacts.extend(
+            purgeable_artifacts.extend(
                 self.filter(
                     offset=retention_count,
                     item_type=item_type,
@@ -245,4 +247,4 @@ class Artifactory(object):
                     terms=terms,
                     sort={"$desc": ["created"]}))
 
-        return sorted(purgable_artifacts, key=lambda k: k['path'])
+        return purgeable_artifacts

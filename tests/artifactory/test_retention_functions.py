@@ -27,33 +27,33 @@ def artifactory(mock_party, mock_credentials):
 @mock.patch('lavatory.utils.artifactory.party.Party.find_by_aql')
 @mock.patch('lavatory.utils.artifactory.party.Party.get_properties')
 def test_get_all_artifacts(mock_properties, mock_find_aql, artifactory):
-    """Tests get_all_repo_artifacts returns all artifacts sorted"""
+    """Tests get_all_repo_artifacts returns all artifacts."""
     test_artifacts = {'results': [TEST_ARTIFACT2, TEST_ARTIFACT1]}
     mock_find_aql.return_value = test_artifacts
 
-    expected_return = [TEST_ARTIFACT1, TEST_ARTIFACT2]
+    expected_return = [TEST_ARTIFACT2, TEST_ARTIFACT1]
     artifacts = artifactory.get_all_repo_artifacts()
     assert artifacts == expected_return
 
 
 @mock.patch('lavatory.utils.artifactory.party.Party.find_by_aql')
 def test_count_based_retention(mock_find_aql, artifactory):
-    """Tests count base retention returns sorted values"""
+    """Tests count base retention returns values"""
     test_artifacts = {'results': [TEST_ARTIFACT2, TEST_ARTIFACT1]}
     mock_find_aql.return_value = test_artifacts
 
     # deplicates values because of nested search at project level. Expected
-    expected_return = [TEST_ARTIFACT1, TEST_ARTIFACT1, TEST_ARTIFACT2, TEST_ARTIFACT2]
+    expected_return = [TEST_ARTIFACT2, TEST_ARTIFACT1, TEST_ARTIFACT2, TEST_ARTIFACT1]
     purgable = artifactory.count_based_retention(retention_count=1)
     assert purgable == expected_return
 
 
 @mock.patch('lavatory.utils.artifactory.party.Party.find_by_aql')
 def test_time_based_retention(mock_find_aql, artifactory):
-    """Tests count base retention returns sorted values"""
+    """Tests count base retention returns values"""
     test_artifacts = {'results': [TEST_ARTIFACT2, TEST_ARTIFACT1]}
     mock_find_aql.return_value = test_artifacts
 
-    expected_return = [TEST_ARTIFACT1, TEST_ARTIFACT2]
+    expected_return = [TEST_ARTIFACT2, TEST_ARTIFACT1]
     purgable = artifactory.time_based_retention(keep_days=10)
     assert purgable == expected_return
