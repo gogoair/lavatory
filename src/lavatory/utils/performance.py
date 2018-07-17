@@ -14,8 +14,8 @@ def get_performance_report(repo_name, old_info, new_info):
         old_info (dict): Metadata of repository before run
         new_info (dict): Metadata of repository after run
     """
-    old_space = parse_size(old_info['usedSpace'])
-    new_space = parse_size(new_info['usedSpace'])
+    old_space = _get_human_friendly_used_space(old_info)
+    new_space = _get_human_friendly_used_space(new_info)
     old_files = old_info["filesCount"]
     new_files = new_info["filesCount"]
 
@@ -24,6 +24,10 @@ def get_performance_report(repo_name, old_info, new_info):
              format_size(new_space - old_space),
              get_percentage(old_space, new_space),
              format_number(new_files - old_files), get_percentage(old_files, new_files))
+
+
+def _get_human_friendly_used_space(info):
+    return parse_size(info['usedSpace'].replace(',', ''))
 
 
 def get_percentage(old, new):
