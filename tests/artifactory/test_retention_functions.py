@@ -10,9 +10,7 @@ TEST_ARTIFACT2 = {'name': 'test2', 'path': '/path/to/test/2'}
 
 
 @pytest.fixture
-@mock.patch('lavatory.utils.artifactory.load_credentials')
-@mock.patch('lavatory.utils.artifactory.party.Party.request')
-def artifactory(mock_party, mock_credentials):
+def artifactory(mock_credentials):
     creds = {
         'artifactory_password': 'test_password',
         'artifactory_url': 'test_url',

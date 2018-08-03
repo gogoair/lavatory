@@ -9,9 +9,19 @@ TEST_PROPS = {'build': 1, 'other': 'test'}
 
 
 @pytest.fixture
-@mock.patch('lavatory.utils.artifactory.load_credentials')
-@mock.patch('lavatory.utils.artifactory.party.Party.request')
-def artifactory(mock_party, mock_credentials):
+def mock_party():
+    with mock.patch('lavatory.utils.artifactory.load_credentials') as m:
+        yield m
+
+
+@pytest.fixture
+def mock_credentials(mock_party):
+    with mock.patch('lavatory.utils.artifactory.load_credentials') as m:
+        yield m
+
+
+@pytest.fixture
+def artifactory(mock_credentials):
     creds = {
         'artifactory_password': 'test_password',
         'artifactory_url': 'test_url',
@@ -38,6 +48,7 @@ def test_get_artifact_properties(mock_properties, artifactory):
     test_artifact = {"name": "test", "path": "path/to/test"}
     props = artifactory.get_artifact_properties(test_artifact)
     assert props == TEST_PROPS
+
 
 @mock.patch('lavatory.utils.artifactory.party.Party.post')
 def test_move_artifacts(artifactory):

@@ -108,5 +108,8 @@ venv.bak/
 .idea/
 # End of https://www.gitignore.io/api/python
 
+# pytest
+.pytest_cache
+
 #Lavatory Specific
 docs/lavatory/
