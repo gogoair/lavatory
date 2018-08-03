@@ -14,7 +14,7 @@ from ..credentials import load_credentials
 LOG = logging.getLogger(__name__)
 
 
-class Artifactory(object):
+class Artifactory:
     """Artifactory purger class."""
 
     def __init__(self, repo_name=None):

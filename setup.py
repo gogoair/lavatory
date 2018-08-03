@@ -49,5 +49,6 @@ setup(
     entry_points={
         'console_scripts': [
             'lavatory=lavatory.__main__:root'
-            ]},
-    )
+        ]
+    },
+)
