@@ -21,13 +21,12 @@ def setup_pluginbase(extra_policies_path=None):
     default_path_obj = here / "../policies"
     default_path = str(default_path_obj.resolve())
 
-    all_paths = []
+    all_paths = [default_path]
     if extra_policies_path:
         extra_policies = pathlib.Path(extra_policies_path).expanduser().resolve()
         if not extra_policies.is_dir():
             raise InvalidPoliciesDirectory
-        all_paths.append(str(extra_policies))
-    all_paths.append(default_path)
+        all_paths.insert(0, str(extra_policies))
     LOG.info("Searching for policies in %s", str(all_paths))
     plugin_base = PluginBase(package='lavatory.policy_plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
