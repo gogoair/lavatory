@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 
 from pluginbase import PluginBase
@@ -23,10 +24,12 @@ def setup_pluginbase(extra_policies_path=None):
 
     all_paths = [default_path]
     if extra_policies_path:
-        extra_policies = pathlib.Path(extra_policies_path).expanduser().resolve()
-        if not extra_policies.is_dir():
+        extra_policies_obj = pathlib.Path(extra_policies_path)
+        if extra_policies_obj.is_dir():
+            extra_policies = get_directory_path(extra_policies_obj)
+            all_paths.insert(0, str(extra_policies))
+        else:
             raise InvalidPoliciesDirectory
-        all_paths.insert(0, str(extra_policies))
     LOG.info("Searching for policies in %s", str(all_paths))
     plugin_base = PluginBase(package='lavatory.policy_plugins')
     plugin_source = plugin_base.make_plugin_source(searchpath=all_paths)
@@ -56,3 +59,20 @@ def get_policy(plugin_source, repository, default=True):
             LOG.info("No policy found for %s. Skipping Default", repository)
             policy = None
     return policy
+
+
+def get_directory_path(directory):
+    """Gets policy from plugin_source.
+
+    Args:
+        directory (Path): Directory path
+
+    Returns:
+        full_path (Path): The full expanded directory path
+    """
+    full_path = ''
+    if hasattr(directory, 'expanduser'):
+        full_path = directory.expanduser().resolve()
+    else:
+        full_path = pathlib.Path(os.path.expanduser(directory)).resolve()
+    return full_path
