@@ -1,5 +1,4 @@
 import logging
-import os
 import pathlib
 
 from pluginbase import PluginBase
@@ -24,9 +23,10 @@ def setup_pluginbase(extra_policies_path=None):
 
     all_paths = []
     if extra_policies_path:
-        if not os.path.isdir(extra_policies_path):
+        extra_policies = pathlib.Path(extra_policies_path).expanduser().resolve()
+        if not extra_policies.is_dir():
             raise InvalidPoliciesDirectory
-        all_paths.append(extra_policies_path)
+        all_paths.append(str(extra_policies))
     all_paths.append(default_path)
     LOG.info("Searching for policies in %s", str(all_paths))
     plugin_base = PluginBase(package='lavatory.policy_plugins')
