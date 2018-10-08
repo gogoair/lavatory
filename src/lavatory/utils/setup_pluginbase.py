@@ -1,5 +1,6 @@
 import logging
 import os
+import pathlib
 
 from pluginbase import PluginBase
 
@@ -17,8 +18,10 @@ def setup_pluginbase(extra_policies_path=None):
     Returns:
         PluginSource: PluginBase PluginSource for finding plugins
     """
-    here = os.path.dirname(os.path.realpath(__file__))
-    default_path = "{}/../policies".format(here)
+    here = pathlib.Path(__file__).parent.absolute()
+    default_path_obj = here / "../policies"
+    default_path = str(default_path_obj.resolve())
+
     all_paths = []
     if extra_policies_path:
         if not os.path.isdir(extra_policies_path):
