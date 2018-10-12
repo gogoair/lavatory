@@ -6,7 +6,7 @@ import logging
 import click
 
 from ..consts import REPO_TYPES
-from ..utils.get_artifactory_info import get_artifactory_info
+from ..utils.get_artifactory_info import get_repos
 from ..utils.setup_pluginbase import get_policy, setup_pluginbase
 
 LOG = logging.getLogger(__name__)
@@ -33,8 +33,7 @@ def policies(ctx, policies_path, repo, repo_type):
     """Prints out a JSON list of all repos and policy descriptions."""
     LOG.debug('Passed args: %s, %s, %s, %s', ctx, policies_path, repo, repo_type)
 
-    # pylint: disable=unused-variable
-    storage_info, selected_repos = get_artifactory_info(repo_names=repo, repo_type=repo_type)
+    selected_repos = get_repos(repo_names=repo, repo_type=repo_type)
 
     plugin_source = setup_pluginbase(extra_policies_path=policies_path)
     policy_list = [get_description(plugin_source, r) for r in selected_repos]

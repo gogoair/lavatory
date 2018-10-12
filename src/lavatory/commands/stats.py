@@ -3,7 +3,7 @@ import logging
 
 import click
 
-from ..utils.get_artifactory_info import get_artifactory_info
+from ..utils.get_artifactory_info import get_repos, get_storage
 
 LOG = logging.getLogger(__name__)
 
@@ -19,9 +19,14 @@ LOG = logging.getLogger(__name__)
 def stats(ctx, repo):
     """Get statistics of repos."""
     LOG.debug('Passed args: %s, %s.', ctx, repo)
-    storage, keys = get_artifactory_info(repo_names=repo, repo_type='any')
 
-    for repository in keys:
+    storage = get_storage(repo_names=repo, repo_type='any')
+    if not storage:
+        click.echo('User does not have "Admin Privileges" to generate statistics.')
+        return
+
+    repositories = get_repos(repo_names=repo, repo_type='any')
+    for repository in repositories:
         repo = storage.get(repository)
         if repo is None:
             LOG.error('Repo name %s does not exist.', repository)

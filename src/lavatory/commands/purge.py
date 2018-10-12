@@ -6,7 +6,7 @@ import click
 
 from ..consts import REPO_TYPES
 from ..utils.artifactory import Artifactory
-from ..utils.get_artifactory_info import get_artifactory_info
+from ..utils.get_artifactory_info import get_repos, get_storage
 from ..utils.performance import get_performance_report
 from ..utils.setup_pluginbase import get_policy, setup_pluginbase
 
@@ -38,7 +38,8 @@ def purge(ctx, dryrun, policies_path, default, repo, repo_type):  # pylint: disa
     """Deletes artifacts based on retention policies."""
     LOG.debug('Passed args: %s, %s, %s, %s, %s, %s', ctx, dryrun, policies_path, default, repo, repo_type)
 
-    storage_info, selected_repos = get_artifactory_info(repo_names=repo, repo_type=repo_type)
+    storage_info = get_storage(repo_names=repo, repo_type=repo_type)
+    selected_repos = get_repos(repo_names=repo, repo_type=repo_type)
 
     apply_purge_policies(selected_repos, policies_path=policies_path, dryrun=dryrun, default=default)
     generate_purge_report(selected_repos, storage_info)
@@ -76,6 +77,9 @@ def generate_purge_report(purged_repos, before_purge_data):
         purged_repos (list): List of repos that had policy applied.
         before_purge_data (dict): Data on the state of Artifactory before purged artifacts
     """
+    if not before_purge_data:
+        LOG.info('User does not have "Admin Privileges" to generate performance details.')
+        return
     LOG.info("Purging Performance:")
     artifactory = Artifactory(repo_name=None)
     after_purge_data = artifactory.repos()
