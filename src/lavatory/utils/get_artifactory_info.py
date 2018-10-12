@@ -1,7 +1,35 @@
 """Helper method for getting artifactory information."""
 import logging
 
+import requests
+
 from .artifactory import Artifactory
+
+
+def _artifactory(artifactory=None, repo_names=None):
+    if not artifactory:
+        artifactory = Artifactory(repo_name=repo_names)
+    return artifactory
+
+
+def get_storage(repo_names=None, repo_type=None):
+    artifactory = _artifactory(repo_names=repo_names)
+    storage_info = []
+    try:
+        storage_info = artifactory.repos(repo_type=repo_type)
+    except requests.exceptions.HTTPError:
+        logging.warning('Account is not an admin and may not be able to get storage details.')
+    logging.debug('Storage info: %s', storage_info)
+    return storage_info
+
+
+def get_repos(repo_names=None, repo_type='local'):
+    repos = []
+    if repo_names:
+        repos = repo_names
+    else:
+        repos = get_storage(repo_names=repo_names, repo_type=repo_type)
+    return repos
 
 
 def get_artifactory_info(repo_names=None, repo_type='local'):
