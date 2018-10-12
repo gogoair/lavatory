@@ -5,6 +5,8 @@ import requests
 
 from .artifactory import Artifactory
 
+LOG = logging.getLogger(__name__)
+
 
 def _artifactory(artifactory=None, repo_names=None):
     if not artifactory:
@@ -18,8 +20,8 @@ def get_storage(repo_names=None, repo_type=None):
     try:
         storage_info = artifactory.repos(repo_type=repo_type)
     except requests.exceptions.HTTPError:
-        logging.warning('Account is not an admin and may not be able to get storage details.')
-    logging.debug('Storage info: %s', storage_info)
+        LOG.warning('Account is not an admin and may not be able to get storage details.')
+    LOG.debug('Storage info: %s', storage_info)
     return storage_info
 
 
@@ -51,7 +53,7 @@ def get_artifactory_info(repo_names=None, repo_type='local'):
     else:
         keys = storage_info.keys()
 
-    logging.debug('Storage info: %s', storage_info)
-    logging.debug('Keys: %s', keys)
+    LOG.debug('Storage info: %s', storage_info)
+    LOG.debug('Keys: %s', keys)
 
     return storage_info, keys
