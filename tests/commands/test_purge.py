@@ -33,10 +33,11 @@ def runner():
     return CliRunner()
 
 
-@mock.patch('lavatory.commands.purge.get_artifactory_info')
+@mock.patch('lavatory.commands.purge.get_storage')
+@mock.patch('lavatory.commands.purge.get_repos')
 @mock.patch('lavatory.commands.purge.apply_purge_policies')
 @mock.patch('lavatory.commands.purge.generate_purge_report')
-def test_policies(mock_purge_report, mock_purge_policies, mock_get_art_info, runner):
+def test_policies(mock_purge_report, mock_purge_policies, mock_get_repos, mock_get_storage, runner):
     data = {
         'test-local': {
             'repoKey': 'test-local',
@@ -49,8 +50,8 @@ def test_policies(mock_purge_report, mock_purge_policies, mock_get_art_info, run
             'percentage': '8.05%'
         }
     }
-    key = data.keys()
-    mock_get_art_info.return_value = data, key
+    mock_get_repos.return_value = data
+    mock_get_storage.return_value = True
     mock_purge_report.return_value = True
     mock_purge_policies.return_value = True
     result_one = runner.invoke(purge)

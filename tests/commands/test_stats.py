@@ -12,8 +12,9 @@ def runner():
     return CliRunner()
 
 
-@mock.patch('lavatory.commands.stats.get_artifactory_info')
-def test_command_stats(mock_artifactory, runner):
+@mock.patch('lavatory.commands.stats.get_storage')
+@mock.patch('lavatory.commands.stats.get_repos')
+def test_command_stats(mock_get_repos, mock_get_storage, runner):
     data = {
         'test-local': {
             'repoKey': 'test-local',
@@ -26,12 +27,12 @@ def test_command_stats(mock_artifactory, runner):
             'percentage': '8.05%'
         }
     }
-    key = data.keys()
-    mock_artifactory.return_value = data, key
+    mock_get_repos.return_value = data
+    mock_get_storage.return_value = {}
     result_one = runner.invoke(stats, ['--repo', 'test-local'])
     result_two = runner.invoke(stats)
 
     assert result_one.exit_code == 0
-    assert result_one.output == 'Done.\n'
+    assert 'does not have' in result_one.output
     assert result_two.exit_code == 0
-    assert result_two.output == 'Done.\n'
+    assert 'does not have' in result_two.output

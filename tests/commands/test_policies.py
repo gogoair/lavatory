@@ -21,8 +21,8 @@ def test_get_description(mock_get_policy):
     assert 'policy_description' in description.keys()
 
 
-@mock.patch('lavatory.commands.policies.get_artifactory_info')
-def test_policies(mock_get_art_info, runner):
+@mock.patch('lavatory.commands.policies.get_repos')
+def test_policies(mock_get_repos, runner):
     data = {
         'test-local': {
             'repoKey': 'test-local',
@@ -35,8 +35,7 @@ def test_policies(mock_get_art_info, runner):
             'percentage': '8.05%'
         }
     }
-    key = data.keys()
-    mock_get_art_info.return_value = data, key
+    mock_get_repos.return_value = data
     result_one = runner.invoke(policies)
 
     assert result_one.exit_code == 0
