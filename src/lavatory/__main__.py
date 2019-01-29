@@ -1,10 +1,8 @@
 """Main entry point."""
 import logging
-import pprint
 
 import click
 import coloredlogs
-import pip
 
 from .commands.policies import policies
 from .commands.purge import purge
@@ -31,18 +29,9 @@ def root(ctx, verbose):
 @root.command()
 def version():
     """Print version information."""
-    for package_info in pip.commands.show.search_packages_info([__package__]):
-        LOG.debug('Full package info: %s', pprint.pformat(package_info))
-
-        name = package_info['name']
-        if name != __package__:
-            LOG.debug('This is not the package you are looking for: %s', name)
-            continue
-
-        click.echo(package_info['version'])
-        break
-    else:
-        raise KeyError('Could not find {0}'.format(__package__))
+    import pkg_resources
+    lavatory_version = pkg_resources.get_distribution('lavatory').version
+    click.echo(lavatory_version)
 
 
 root.add_command(policies)
