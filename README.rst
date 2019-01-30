@@ -12,7 +12,7 @@ See `Lavatory Documentation`_ for the full docs.
 Requirements
 ------------
 
--  Python 3.4+
+-  Python 3.5+
 -  Artifactory user with API permissions
 
 Authentication
