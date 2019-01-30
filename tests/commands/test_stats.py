@@ -33,6 +33,4 @@ def test_command_stats(mock_get_repos, mock_get_storage, runner):
     result_two = runner.invoke(stats)
 
     assert result_one.exit_code == 0
-    assert 'does not have' in result_one.output
     assert result_two.exit_code == 0
-    assert 'does not have' in result_two.output

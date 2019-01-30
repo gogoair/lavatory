@@ -22,7 +22,7 @@ def stats(ctx, repo):
 
     storage = get_storage(repo_names=repo, repo_type='any')
     if not storage:
-        click.echo('User does not have "Admin Privileges" to generate statistics.')
+        LOG.info('User does not have "Admin Privileges" to generate statistics.')
         return
 
     repositories = get_repos(repo_names=repo, repo_type='any')
