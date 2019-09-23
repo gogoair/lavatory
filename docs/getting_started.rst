@@ -74,6 +74,23 @@ provided, Lavatory will run against all repos in Artifactory.
 By default, Lavatory runs in drymode. Must include ``--nodryrun`` in order to
 actually delete Artifacts
 
+Configure SSL
+~~~~~~~~~~~~~
+
+When HTTPS Artifactory URL is provided, Lavatory uses ``certifi`` to get the
+list of trusted certificates.
+
+If your server's certificate is not signed by any of certifi's authorities,
+you can either update the certifi's list whose file system path can be retrieved
+by the following command:
+
+::
+
+    python -c "import certifi; print(certifi.where())"
+
+or you can instruct Lavatory to use your own CA bundle file path by setting
+the environment variable ``LAVATORY_CERTBUNDLE_PATH``.
+
 CLI Help
 --------
 

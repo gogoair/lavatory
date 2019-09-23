@@ -1,4 +1,5 @@
 """Artifactory purger module."""
+import os
 import base64
 import datetime
 import logging
@@ -29,7 +30,7 @@ class Artifactory:
         self.artifactory.artifactory_url = self.api_url
         self.artifactory.username = self.credentials['artifactory_username']
         self.artifactory.password = base64.encodebytes(bytes(self.credentials['artifactory_password'], 'utf-8'))
-        self.artifactory.certbundle = certifi.where()
+        self.artifactory.certbundle = os.getenv('LAVATORY_CERTBUNDLE_PATH', certifi.where())
 
     def repos(self, repo_type='local'):
         """
